@@ -57,7 +57,7 @@ public class Request {
         String host = url.getHost();
 
         Socket s = HOST_SOCKETS_MAP.get(host);
-        if (!s.isClosed()) {
+        if (s != null && !s.isClosed()) {
             return s;
         } else {
             int port = url.getPort();
