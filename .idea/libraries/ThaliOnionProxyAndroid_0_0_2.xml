@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="ThaliOnionProxyAndroid-0.0.2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.msopentech.thali/ThaliOnionProxyAndroid/0.0.2/jars/libs/jtorctl-briar.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.msopentech.thali/ThaliOnionProxyAndroid/0.0.2/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.msopentech.thali/ThaliOnionProxyAndroid/0.0.2/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/msopentech/thali/ThaliOnionProxyAndroid/0.0.2/ThaliOnionProxyAndroid-0.0.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
