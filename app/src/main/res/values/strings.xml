@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">sTORe</string>
+
+
+    <string name="sad_face">:(</string>
+
+
+    <string name="navigation_search">Search</string>
+
+
+    <string name="main_activity_category_communication">Communication</string>
+    <string name="main_activity_category_entertainment">Entertainment</string>
+    <string name="main_activity_category_shopping">Shopping</string>
+    <string name="main_activity_category_utilities">Utilities</string>
+
+
+    <string name="featured_app_list_fragment_">Utilities</string>
+
 </resources>
