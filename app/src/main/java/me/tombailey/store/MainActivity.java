@@ -21,14 +21,12 @@ import android.util.Log;
 import me.tombailey.store.fragment.FeaturedAppListFragment;
 import me.tombailey.store.http.Proxy;
 import me.tombailey.store.model.Category;
-import rx.functions.Action1;
-import rx.subjects.PublishSubject;
+import rx.subjects.ReplaySubject;
 
 public class MainActivity extends AppCompatActivity {
 
     private BroadcastReceiver mProxyBroadReceiver;
-    private PublishSubject<Intent> mProxyStatusUpdates;
-    private PublishSubject<Proxy> mProxyUpdates;
+    private ReplaySubject<Proxy> mProxyUpdates;
 
 
     @Override
@@ -110,9 +108,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupProxy() {
-        startProxy();
         registerForProxyUpdates();
-        registerForProxy();
+        startProxy();
     }
 
     private void startProxy() {
@@ -123,38 +120,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void registerForProxyUpdates() {
-        mProxyStatusUpdates = PublishSubject.create();
+        mProxyUpdates = ((StoreApp) getApplication()).getProxyReplaySubject();
 
         IntentFilter proxyIntentFilter = new IntentFilter();
         proxyIntentFilter.addAction("me.tombailey.store.PROXY_STATUS_UPDATE");
         mProxyBroadReceiver = new BroadcastReceiver() {
             @Override
-            public void onReceive(Context context, Intent intent) {
-                if ("me.tombailey.store.PROXY_STATUS_UPDATE".equalsIgnoreCase(intent.getAction())) {
-                    mProxyStatusUpdates.onNext(intent);
+            public void onReceive(Context context, Intent statusUpdate) {
+                if ("me.tombailey.store.PROXY_STATUS_UPDATE".equalsIgnoreCase(statusUpdate.getAction())) {
+                    String status = statusUpdate.getStringExtra("status");
+                    Log.d(getClass().getName(), "proxy status is now '" + status + "'");
+
+                    if ("running".equalsIgnoreCase(status)) {
+                        String host = statusUpdate.getStringExtra("host");
+                        int port = statusUpdate.getIntExtra("port", 0);
+
+                        Log.d(getClass().getName(), "proxy is running on " + host + ":" + port);
+
+                        mProxyUpdates.onNext(new Proxy(host, port));
+                    }
                 }
             }
         };
         registerReceiver(mProxyBroadReceiver, proxyIntentFilter);
-    }
-
-    private void registerForProxy() {
-        mProxyUpdates = PublishSubject.create();
-        mProxyStatusUpdates.subscribe(new Action1<Intent>() {
-            @Override
-            public void call(Intent statusUpdate) {
-                String status = statusUpdate.getStringExtra("status");
-
-                Log.d(getClass().getName(), "proxy status is now '" + status + "'");
-                if ("running".equalsIgnoreCase(status)) {
-                    String host = statusUpdate.getStringExtra("host");
-                    int port = statusUpdate.getIntExtra("port", 0);
-                    Log.d(getClass().getName(), "proxy is running on " + host + ":" + port);
-
-                    mProxyUpdates.onNext(new Proxy(host, port));
-                }
-            }
-        });
     }
 
     private void unregisterForProxyUpdates() {
