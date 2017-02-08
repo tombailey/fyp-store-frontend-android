@@ -26,8 +26,10 @@ import me.tombailey.store.model.App;
 import me.tombailey.store.model.Category;
 import me.tombailey.store.rx.service.AppService;
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Tom on 29/11/2016.
@@ -92,6 +94,8 @@ public class FeaturedAppListFragment extends Fragment {
                         return AppService.getAppsUsingCategory(proxy, mCategory.toString(), mPage++);
                     }
                 })
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Action1<App[]>() {
             @Override
             public void call(App[] apps) {
