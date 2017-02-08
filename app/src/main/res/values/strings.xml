@@ -3,6 +3,7 @@
 
 
     <string name="sad_face">:(</string>
+    <string name="retry">Retry</string>
 
 
     <string name="navigation_search">Search</string>
@@ -14,6 +15,6 @@
     <string name="main_activity_category_utilities">Utilities</string>
 
 
-    <string name="featured_app_list_fragment_">Utilities</string>
+    <string name="featured_app_list_fragment_no_apps">Utilities</string>
 
 </resources>
