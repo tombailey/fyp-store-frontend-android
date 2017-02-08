@@ -20,6 +20,7 @@ import me.tombailey.store.R;
 import me.tombailey.store.StoreApp;
 import me.tombailey.store.adapter.AdapterItemSelectedListener;
 import me.tombailey.store.adapter.FeaturedAppListAdapter;
+import me.tombailey.store.exception.NoAppsException;
 import me.tombailey.store.http.Proxy;
 import me.tombailey.store.model.App;
 import me.tombailey.store.model.Category;
@@ -95,7 +96,7 @@ public class FeaturedAppListFragment extends Fragment {
             @Override
             public void call(App[] apps) {
                 if (apps.length == 0) {
-                    showNoApps();
+                    throw new NoAppsException();
                 } else {
                     showApps(apps);
                 }
@@ -110,9 +111,20 @@ public class FeaturedAppListFragment extends Fragment {
     }
 
     private void showError(Throwable throwable) {
+        mProgressBar.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.GONE);
+        mErrorView.setVisibility(View.VISIBLE);
+
         TextView tvErrorDescription = (TextView) mErrorView.findViewById(R.id.featured_app_list_fragment_text_view_error_description);
-        //TODO: better error description
-        tvErrorDescription.setText("Something went wrong");
+        if (throwable instanceof NoAppsException) {
+            //TODO: use R.string
+            tvErrorDescription.setText("No apps were found");
+        } else {
+            //TODO: better error description
+            tvErrorDescription.setText("Something went wrong");
+        }
+
+
 
         mErrorView.findViewById(R.id.featured_app_list_fragment_button_error_retry).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,12 +132,6 @@ public class FeaturedAppListFragment extends Fragment {
                 init();
             }
         });
-    }
-
-    private void showNoApps() {
-        mProgressBar.setVisibility(View.GONE);
-        mRecyclerView.setVisibility(View.GONE);
-        mErrorView.setVisibility(View.VISIBLE);
     }
 
     private void showApps(App[] apps) {
