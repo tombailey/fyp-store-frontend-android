@@ -1,14 +1,22 @@
 package me.tombailey.store.service;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.msopentech.thali.android.toronionproxy.AndroidOnionProxyManager;
 import com.msopentech.thali.toronionproxy.OnionProxyManager;
 
 import java.io.IOException;
+
+import me.tombailey.store.ProxyStatusActivity;
+import me.tombailey.store.R;
 
 /**
  * Created by tomba on 23/01/2017.
@@ -29,6 +37,8 @@ public class TorConnectionService extends Service {
 
 
     private static final String LOG_TAG = TorConnectionService.class.getName();
+
+    private static final int PROXY_NOTFICATION_ID = 42;
 
 
     private OnionProxyManager mOnionProxyManager;
@@ -58,6 +68,7 @@ public class TorConnectionService extends Service {
                             if (startOnionProxy()) {
                                 try {
                                     broadcastProxyRunning();
+                                    showProxyNotification();
                                 } catch (IOException ioe) {
                                     ioe.printStackTrace();
                                     broadcastProxyNotRunning();
@@ -70,6 +81,7 @@ public class TorConnectionService extends Service {
                         if (isOnionProxyRunning()) {
                             Log.d(LOG_TAG, "Stopping OnionProxy");
                             stopOnionProxy();
+                            hideProxyNotification();
                         } else {
                             Log.w(LOG_TAG, "Received stop command for OnionProxy but not running");
                         }
@@ -132,6 +144,40 @@ public class TorConnectionService extends Service {
 
     private int getOnionProxyPort() throws IOException {
         return mOnionProxyManager.getIPv4LocalHostSocksPort();
+    }
+
+    private void showProxyNotification() {
+        PendingIntent proxyStatusIntent = getProxyStatusPendingIntent();
+        PendingIntent stopProxyIntent = getStopProxyPendingIntent();
+
+        Notification proxyNotification = new NotificationCompat.Builder(this)
+                .setSmallIcon(com.msopentech.thali.toronionproxy.android.R.drawable.ic_launcher)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.proxy_service_notification_text))
+                .setContentIntent(proxyStatusIntent)
+                .addAction(R.drawable.ic_stop_white_24dp, getString(R.string.stop), stopProxyIntent)
+                .setOngoing(true)
+                .build();
+
+        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
+                .notify(PROXY_NOTFICATION_ID, proxyNotification);
+    }
+
+    private PendingIntent getProxyStatusPendingIntent() {
+        Intent proxyStatusIntent = new Intent(this, ProxyStatusActivity.class);
+        return PendingIntent.getActivity(this, 0, proxyStatusIntent, 0);
+    }
+
+    private PendingIntent getStopProxyPendingIntent() {
+        Intent stopProxy = new Intent();
+        stopProxy.setComponent(new ComponentName("me.tombailey.store", "me.tombailey.store.service.TorConnectionService"));
+        stopProxy.setAction(STOP);
+
+        return PendingIntent.getBroadcast(this, 0, stopProxy, 0);
+    }
+
+    private void hideProxyNotification() {
+        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(PROXY_NOTFICATION_ID);
     }
 
     @Override

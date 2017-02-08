@@ -4,6 +4,10 @@
 
     <string name="sad_face">:(</string>
     <string name="retry">Retry</string>
+    <string name="stop">Stop</string>
+
+
+    <string name="proxy_service_notification_text">TOR proxy is running...</string>
 
 
     <string name="navigation_search">Search</string>
