@@ -92,12 +92,13 @@ public class FeaturedAppListFragment extends Fragment {
 
         ((StoreApp) mActivity.getApplication()).getProxyReplaySubject()
         .timeout(2, TimeUnit.MINUTES)
-                .flatMap(new Func1<Proxy, Observable<App[]>>() {
-                    @Override
-                    public Observable<App[]> call(Proxy proxy) {
-                        return AppService.getAppsUsingCategory(proxy, mCategory.toString(), mPage++);
-                    }
-                })
+        .take(1)
+        .flatMap(new Func1<Proxy, Observable<App[]>>() {
+            @Override
+            public Observable<App[]> call(final Proxy proxy) {
+                return AppService.getAppsUsingCategory(proxy, mCategory.toString(), mPage++);
+            }
+        })
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Action1<App[]>() {
