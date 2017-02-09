@@ -29,7 +29,7 @@ public class AppService {
                     Request request = new Request.Builder()
                             .proxy(proxy)
                             .get()
-                            .url(HOST_NAME + "/api/applications/" + id)
+                            .url("http://" + HOST_NAME + "/api/applications/" + id)
                             .build();
                     Response response = request.execute();
 
@@ -54,7 +54,7 @@ public class AppService {
                     Request request = new Request.Builder()
                             .proxy(proxy)
                             .get()
-                            .url(HOST_NAME + "/api/applications?keywords=" +
+                            .url("http://" + HOST_NAME + "/api/applications?keywords=" +
                                     keywords + "&page=" + page)
                             .build();
                     Response response = request.execute();
@@ -85,7 +85,7 @@ public class AppService {
                     Request request = new Request.Builder()
                             .proxy(proxy)
                             .get()
-                            .url(HOST_NAME + "/api/applications?category=" +
+                            .url("http://" + HOST_NAME + "/api/applications?category=" +
                                     category + "&page=" + page +
                                     "&sortBy=currentVersionDate&sortDirection=desc")
                             .build();
