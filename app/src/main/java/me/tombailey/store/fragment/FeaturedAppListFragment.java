@@ -84,6 +84,10 @@ public class FeaturedAppListFragment extends Fragment {
     }
 
     private void init() {
+        mProgressBar.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
+        mErrorView.setVisibility(View.GONE);
+
         mPage = 1;
 
         ((StoreApp) mActivity.getApplication()).getProxyReplaySubject()
