@@ -17,7 +17,7 @@ public class StoreApp extends Application {
     public void onCreate() {
         super.onCreate();
 
-        mProxyReplaySubject = ReplaySubject.create();
+        mProxyReplaySubject = ReplaySubject.create(1);
     }
 
     public ReplaySubject<Proxy> getProxyReplaySubject() {
