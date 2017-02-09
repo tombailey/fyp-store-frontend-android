@@ -30,6 +30,7 @@ public class TorConnectionService extends Service {
     public static final String STATUS = "status";
     public static final String STATUS_RUNNING = "running";
     public static final String STATUS_NOT_RUNNING = "not running";
+
     public static final String PROXY_STATUS_UPDATE = "me.tombailey.store.PROXY_STATUS_UPDATE";
     public static final String HOST = "host";
     public static final String PORT = "port";
@@ -84,6 +85,17 @@ public class TorConnectionService extends Service {
                             hideProxyNotification();
                         } else {
                             Log.w(LOG_TAG, "Received stop command for OnionProxy but not running");
+                        }
+                    } else if (STATUS.equals(action)) {
+                        if (isOnionProxyRunning()) {
+                            try {
+                                broadcastProxyRunning();
+                            } catch (IOException ioe) {
+                                ioe.printStackTrace();
+                                broadcastProxyNotRunning();
+                            }
+                        } else {
+                            broadcastProxyNotRunning();
                         }
                     }
                 }
