@@ -18,6 +18,9 @@ import rx.schedulers.Schedulers;
 
 public class AppService {
 
+    private static final String HOST_NAME = "q6yl3es3js7j3gm3.onion";
+
+
     public static Observable<App> getApp(final Proxy proxy, final String id) {
         return Observable.create(new Observable.OnSubscribe<App>() {
             @Override
@@ -26,7 +29,7 @@ public class AppService {
                     Request request = new Request.Builder()
                             .proxy(proxy)
                             .get()
-                            .url("http://ircudcir6p7nd3ux.onion/api/applications/" + id)
+                            .url(HOST_NAME + "/api/applications/" + id)
                             .build();
                     Response response = request.execute();
 
@@ -51,7 +54,7 @@ public class AppService {
                     Request request = new Request.Builder()
                             .proxy(proxy)
                             .get()
-                            .url("http://ircudcir6p7nd3ux.onion/api/applications?keywords=" +
+                            .url(HOST_NAME + "/api/applications?keywords=" +
                                     keywords + "&page=" + page)
                             .build();
                     Response response = request.execute();
@@ -82,7 +85,7 @@ public class AppService {
                     Request request = new Request.Builder()
                             .proxy(proxy)
                             .get()
-                            .url("http://ircudcir6p7nd3ux.onion/api/applications?category=" +
+                            .url(HOST_NAME + "/api/applications?category=" +
                                     category + "&page=" + page +
                                     "&sortBy=currentVersionDate&sortDirection=desc")
                             .build();
