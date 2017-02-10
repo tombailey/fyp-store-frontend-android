@@ -1,10 +1,5 @@
 package me.tombailey.store;
 
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -16,18 +11,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
 import me.tombailey.store.fragment.FeaturedAppListFragment;
-import me.tombailey.store.http.Proxy;
 import me.tombailey.store.model.Category;
-import rx.subjects.ReplaySubject;
 
 public class MainActivity extends AppCompatActivity {
 
-    private BroadcastReceiver mProxyBroadReceiver;
-    private ReplaySubject<Proxy> mProxyUpdates;
-
+    private StoreApp mStoreApp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,16 +27,11 @@ public class MainActivity extends AppCompatActivity {
         init();
     }
 
-    @Override
-    protected void onDestroy() {
-        unregisterForProxyUpdates();
-        super.onDestroy();
-    }
-
     private void init() {
+        mStoreApp = (StoreApp) getApplication();
+
         setupActionBar();
         setupTabLayout();
-        setupProxy();
     }
 
     private void setupActionBar() {
@@ -105,47 +90,5 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.main_activity_tab_layout);
         tabLayout.setupWithViewPager(viewPager);
-    }
-
-    private void setupProxy() {
-        registerForProxyUpdates();
-        startProxy();
-    }
-
-    private void startProxy() {
-        Intent startTorConnectionService = new Intent();
-        startTorConnectionService.setComponent(new ComponentName("me.tombailey.store", "me.tombailey.store.service.TorConnectionService"));
-        startTorConnectionService.setAction("start");
-        startService(startTorConnectionService);
-    }
-
-    private void registerForProxyUpdates() {
-        mProxyUpdates = ((StoreApp) getApplication()).getProxyReplaySubject();
-
-        IntentFilter proxyIntentFilter = new IntentFilter();
-        proxyIntentFilter.addAction("me.tombailey.store.PROXY_STATUS_UPDATE");
-        mProxyBroadReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent statusUpdate) {
-                if ("me.tombailey.store.PROXY_STATUS_UPDATE".equalsIgnoreCase(statusUpdate.getAction())) {
-                    String status = statusUpdate.getStringExtra("status");
-                    Log.d(getClass().getName(), "proxy status is now '" + status + "'");
-
-                    if ("running".equalsIgnoreCase(status)) {
-                        String host = statusUpdate.getStringExtra("host");
-                        int port = statusUpdate.getIntExtra("port", 0);
-
-                        Log.d(getClass().getName(), "proxy is running on " + host + ":" + port);
-
-                        mProxyUpdates.onNext(new Proxy(host, port));
-                    }
-                }
-            }
-        };
-        registerReceiver(mProxyBroadReceiver, proxyIntentFilter);
-    }
-
-    private void unregisterForProxyUpdates() {
-        unregisterReceiver(mProxyBroadReceiver);
     }
 }
