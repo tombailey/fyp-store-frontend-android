@@ -94,7 +94,7 @@ public class FeaturedAppListFragment extends Fragment {
 
         mPage = 1;
 
-        ((StoreApp) mActivity.getApplication()).getProxyReplaySubject()
+        mStoreApp.getProxyReplaySubject()
         .timeout(2, TimeUnit.MINUTES)
         .take(1)
         .flatMap(new Func1<Proxy, Observable<App[]>>() {
