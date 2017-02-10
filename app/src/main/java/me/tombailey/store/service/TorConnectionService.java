@@ -84,9 +84,11 @@ public class TorConnectionService extends Service {
                         if (isOnionProxyRunning()) {
                             Log.d(LOG_TAG, "Stopping OnionProxy");
                             stopOnionProxy();
+                            broadcastProxyNotRunning();
                             hideProxyNotification();
                         } else {
                             Log.w(LOG_TAG, "Received stop command for OnionProxy but not running");
+                            broadcastProxyNotRunning();
                         }
                     } else if (STATUS.equals(action)) {
                         if (isOnionProxyRunning()) {
