@@ -39,7 +39,7 @@ public class TorConnectionService extends Service {
 
     private static final String LOG_TAG = TorConnectionService.class.getName();
 
-    private static final int PROXY_NOTFICATION_ID = 42;
+    private static final int PROXY_NOTIFICATION_ID = 42;
 
 
     private OnionProxyManager mOnionProxyManager;
@@ -176,7 +176,7 @@ public class TorConnectionService extends Service {
                 .build();
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
-                .notify(PROXY_NOTFICATION_ID, proxyNotification);
+                .notify(PROXY_NOTIFICATION_ID, proxyNotification);
     }
 
     private PendingIntent getProxyStatusPendingIntent() {
@@ -193,7 +193,7 @@ public class TorConnectionService extends Service {
     }
 
     private void hideProxyNotification() {
-        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(PROXY_NOTFICATION_ID);
+        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(PROXY_NOTIFICATION_ID);
     }
 
     @Override
