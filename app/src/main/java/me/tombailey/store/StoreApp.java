@@ -42,7 +42,7 @@ public class StoreApp extends Application {
         IntentFilter proxyIntentFilter = new IntentFilter();
         proxyIntentFilter.addAction("me.tombailey.store.PROXY_STATUS_UPDATE");
 
-        if (mProxyBroadReceiver != null) {
+        if (mProxyBroadReceiver == null) {
             mProxyBroadReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent statusUpdate) {
