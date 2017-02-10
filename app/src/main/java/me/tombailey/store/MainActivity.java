@@ -17,8 +17,6 @@ import me.tombailey.store.model.Category;
 
 public class MainActivity extends AppCompatActivity {
 
-    private StoreApp mStoreApp;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,8 +26,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
-        mStoreApp = (StoreApp) getApplication();
-
         setupActionBar();
         setupTabLayout();
     }
