@@ -55,6 +55,8 @@ public class TorConnectionService extends Service {
                 @Override
                 public void run() {
                     String action = intent.getAction();
+                    Log.d(LOG_TAG, "Got intent for action '" + action + "'");
+
                     if (START.equals(action)) {
                         if (isOnionProxyRunning()) {
                             Log.w(LOG_TAG, "Received start command for OnionProxy but already running");
