@@ -19,6 +19,10 @@
     <string name="main_activity_category_utilities">Utilities</string>
 
 
+    <string name="proxy_status_activity_proxy_is_running">TOR proxy is running</string>
+    <string name="proxy_status_activity_proxy_is_not_running">TOR proxy is not running</string>
+
+
     <string name="featured_app_list_fragment_no_apps">Utilities</string>
 
 </resources>

@@ -73,4 +73,18 @@ public class StoreApp extends Application {
         startTorConnectionService.setAction("start");
         startService(startTorConnectionService);
     }
+
+    public void stopProxy() {
+        Intent stopProxy = new Intent();
+        stopProxy.setComponent(new ComponentName("me.tombailey.store", "me.tombailey.store.service.TorConnectionService"));
+        stopProxy.setAction("stop");
+        startService(stopProxy);
+    }
+
+    public void queryProxyStatus() {
+        Intent proxyQuery = new Intent();
+        proxyQuery.setComponent(new ComponentName("me.tombailey.store", "me.tombailey.store.service.TorConnectionService"));
+        proxyQuery.setAction("status");
+        startService(proxyQuery);
+    }
 }
