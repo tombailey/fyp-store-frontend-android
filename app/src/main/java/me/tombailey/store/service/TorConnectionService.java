@@ -187,7 +187,7 @@ public class TorConnectionService extends Service {
         stopProxy.setComponent(new ComponentName("me.tombailey.store", "me.tombailey.store.service.TorConnectionService"));
         stopProxy.setAction(STOP);
 
-        return PendingIntent.getBroadcast(this, 0, stopProxy, 0);
+        return PendingIntent.getService(this, 0, stopProxy, 0);
     }
 
     private void hideProxyNotification() {
