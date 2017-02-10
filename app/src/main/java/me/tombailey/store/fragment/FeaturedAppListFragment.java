@@ -21,6 +21,7 @@ import me.tombailey.store.StoreApp;
 import me.tombailey.store.adapter.AdapterItemSelectedListener;
 import me.tombailey.store.adapter.FeaturedAppListAdapter;
 import me.tombailey.store.exception.NoAppsException;
+import me.tombailey.store.exception.ProxyNotRunningException;
 import me.tombailey.store.http.Proxy;
 import me.tombailey.store.model.App;
 import me.tombailey.store.model.Category;
@@ -39,6 +40,8 @@ public class FeaturedAppListFragment extends Fragment {
 
     private static final String CATEGORY = "category";
 
+
+    private StoreApp mStoreApp;
 
     private FragmentActivity mActivity;
     private Category mCategory;
@@ -66,6 +69,7 @@ public class FeaturedAppListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mActivity = getActivity();
+        mStoreApp = (StoreApp) mActivity.getApplication();
 
         Bundle args = getArguments();
         mCategory = Category.valueOf(args.getString(CATEGORY));
@@ -96,7 +100,12 @@ public class FeaturedAppListFragment extends Fragment {
         .flatMap(new Func1<Proxy, Observable<App[]>>() {
             @Override
             public Observable<App[]> call(final Proxy proxy) {
-                return AppService.getAppsUsingCategory(proxy, mCategory.toString(), mPage++);
+                if (proxy == null) {
+                    mStoreApp.startProxy();
+                    throw new ProxyNotRunningException();
+                } else {
+                    return AppService.getAppsUsingCategory(proxy, mCategory.toString(), mPage++);
+                }
             }
         })
         .subscribeOn(Schedulers.io())
