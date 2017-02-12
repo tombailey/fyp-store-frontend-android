@@ -32,8 +32,9 @@ public class App implements Parcelable {
     private static final String FEATURE_GRAPHIC = "featureGraphic";
     private static final String ICON_LINK = "iconLink";
     private static final String DOWNLOAD_COUNT = "downloadCount";
-    private static final String CURRENT_VERSION_NUMBER = "currentVersionNumber";
-    private static final String CURRENT_VERSION_DATE = "currentVersionDate";
+    private static final String CURRENT_VERSION= "currentVersion";
+    private static final String NUMBER = "number";
+    private static final String DATE = "date";
     private static final String SCREENSHOTS = "screenshots";
     private static final String CATEGORIES = "categories";
 
@@ -70,21 +71,21 @@ public class App implements Parcelable {
             categories[index] = categoriesJson.getString(index);
         }
 
+        JSONObject currentVersion = jsonObject.getJSONObject(CURRENT_VERSION);
+
         return new App(jsonObject.getString(ID), jsonObject.getString(NAME),
                 jsonObject.getString(DESCRIPTION), jsonObject.getString(FEATURE_GRAPHIC),
                 jsonObject.getString(ICON_LINK), jsonObject.getLong(DOWNLOAD_COUNT),
-                jsonObject.getLong(CURRENT_VERSION_NUMBER),
-                jsonObject.getString(CURRENT_VERSION_DATE), screenshots, categories);
+                currentVersion.getLong(NUMBER), currentVersion.getString(DATE), screenshots,
+                categories);
     }
 
 
     public App(Parcel parcel) {
         this(parcel.readString(), parcel.readString(), parcel.readString(), parcel.readString(),
                 parcel.readString(), parcel.readLong(), parcel.readLong(), parcel.readString(),
-                parcel.createStringArray(), parcel.createStringArray());
-
-        //TODO: handle reviews
-        //parcel.createTypedArray(Review.CREATOR));
+                parcel.createStringArray(), parcel.createStringArray(),
+                parcel.createTypedArray(Review.CREATOR));
     }
 
     public App(String id, String name, String description, String featureGraphicLink,
@@ -189,7 +190,6 @@ public class App implements Parcelable {
         parcel.writeStringArray(screenshotLinks);
 
         parcel.writeStringArray(categories);
-
 
         parcel.writeTypedArray(reviews, 0);
     }
