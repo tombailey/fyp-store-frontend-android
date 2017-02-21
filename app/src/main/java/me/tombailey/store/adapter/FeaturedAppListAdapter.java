@@ -43,11 +43,6 @@ public class FeaturedAppListAdapter extends RecyclerView.Adapter<FeaturedAppList
         return mApps.length;
     }
 
-    public void setApps(App[] apps) {
-        mApps = apps;
-        notifyDataSetChanged();
-    }
-
     public class FeaturedAppViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView ivGraphic;
