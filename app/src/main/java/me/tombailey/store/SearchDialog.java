@@ -26,6 +26,8 @@ public class SearchDialog extends AlertDialog {
         private String mSearch;
         private String mCancel;
 
+        private String mSearchQueryRequired;
+
         private View mSearchView;
 
         public Builder(Context context) {
@@ -35,6 +37,8 @@ public class SearchDialog extends AlertDialog {
 
             mSearch = context.getString(R.string.search);
             mCancel = context.getString(R.string.cancel);
+
+            mSearchQueryRequired = context.getString(R.string.search_dialog_keywords_required);
 
             mSearchView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
                     .inflate(R.layout.search_dialog_view, null);
@@ -76,7 +80,7 @@ public class SearchDialog extends AlertDialog {
                                 dialog.dismiss();
                                 mSearchListener.onSearch(keywords);
                             } else {
-                                etKeywords.setError("Search query required");
+                                etKeywords.setError(mSearchQueryRequired);
                             }
                         }
                     });

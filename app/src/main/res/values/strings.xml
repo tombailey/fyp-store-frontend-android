@@ -53,6 +53,7 @@
 
     <string name="search_dialog_title">What are you looking for?</string>
     <string name="search_dialog_keywords_hint">Star Wars</string>
+    <string name="search_dialog_keywords_required">Search query required</string>
 
 
     <string name="create_review_dialog_title">Create Review</string>
