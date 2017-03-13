@@ -9,8 +9,15 @@ import android.widget.TextView;
 
 import com.bumptech.glide.RequestManager;
 
+import java.io.File;
+
 import me.tombailey.store.R;
+import me.tombailey.store.http.Proxy;
 import me.tombailey.store.model.App;
+import me.tombailey.store.rx.service.HttpService;
+import rx.Subscription;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Tom on 28/11/2016.
@@ -20,11 +27,20 @@ public class FeaturedAppListAdapter extends RecyclerView.Adapter<FeaturedAppList
 
     private App[] mApps;
     private RequestManager mRequestManager;
+
+    private Proxy mProxy;
+    private File mTempCacheDir;
+
     private AdapterItemSelectedListener<App> mAppSelectedListener;
 
-    public FeaturedAppListAdapter(App[] apps, RequestManager requestManager, AdapterItemSelectedListener<App> appSelectedListener) {
+    public FeaturedAppListAdapter(App[] apps, RequestManager requestManager, Proxy proxy,
+                                  File tempCacheDir, AdapterItemSelectedListener<App> appSelectedListener) {
         mApps = apps;
         mRequestManager = requestManager;
+
+        mProxy = proxy;
+        mTempCacheDir = tempCacheDir;
+
         mAppSelectedListener = appSelectedListener;
     }
 
@@ -50,6 +66,8 @@ public class FeaturedAppListAdapter extends RecyclerView.Adapter<FeaturedAppList
 
         private App mApp;
 
+        private Subscription mDownloadFeatureGraphic;
+
         public FeaturedAppViewHolder(View itemView) {
             super(itemView);
 
@@ -66,8 +84,28 @@ public class FeaturedAppListAdapter extends RecyclerView.Adapter<FeaturedAppList
 
         public void setApp(App app) {
             mApp = app;
-            mRequestManager.load(app.getFeatureGraphicLink()).into(ivGraphic);
             tvName.setText(app.getName());
+
+            if (mDownloadFeatureGraphic != null && !mDownloadFeatureGraphic.isUnsubscribed()) {
+                mDownloadFeatureGraphic.unsubscribe();
+            }
+
+            if (mProxy != null) {
+                mDownloadFeatureGraphic = HttpService.download(mProxy, app.getFeatureGraphicLink(),
+                        new File(mTempCacheDir, app.getId() + "-featureGraphic.png"))
+                        .subscribeOn(Schedulers.immediate())
+                        .subscribe(new Action1<File>() {
+                            @Override
+                            public void call(File featureGraphicFile) {
+                                mRequestManager.load(featureGraphicFile).into(ivGraphic);
+                            }
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                throwable.printStackTrace();
+                            }
+                        });
+            }
         }
     }
 

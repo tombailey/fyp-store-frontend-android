@@ -27,6 +27,7 @@ import me.tombailey.store.model.App;
 import me.tombailey.store.model.Category;
 import me.tombailey.store.rx.service.AppService;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -54,6 +55,7 @@ public class FeaturedAppListFragment extends Fragment {
 
     private int mPage;
 
+    private Subscription mLoadAppsSubscription;
 
     public static FeaturedAppListFragment newInstance(Category category) {
         FeaturedAppListFragment appFragment = new FeaturedAppListFragment();
@@ -87,6 +89,14 @@ public class FeaturedAppListFragment extends Fragment {
         return mContent;
     }
 
+    @Override
+    public void onDestroy() {
+        if (mLoadAppsSubscription != null && !mLoadAppsSubscription.isUnsubscribed()) {
+            mLoadAppsSubscription.unsubscribe();
+        }
+        super.onDestroy();
+    }
+
     private void init() {
         mProgressBar.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
@@ -94,38 +104,37 @@ public class FeaturedAppListFragment extends Fragment {
 
         mPage = 1;
 
-        mStoreApp.getProxyReplaySubject()
-        .timeout(2, TimeUnit.MINUTES)
-        .take(1)
-        .flatMap(new Func1<Proxy, Observable<App[]>>() {
-            @Override
-            public Observable<App[]> call(final Proxy proxy) {
-                if (proxy == null) {
-                    mStoreApp.startProxy();
-                    throw new ProxyNotRunningException();
-                } else {
-                    return AppService.getAppsUsingCategory(proxy, mCategory.toString(), mPage++);
+        mLoadAppsSubscription = mStoreApp.subscribeForProxy()
+            .timeout(2, TimeUnit.MINUTES)
+            .flatMap(new Func1<Proxy, Observable<App[]>>() {
+                @Override
+                public Observable<App[]> call(final Proxy proxy) {
+                    if (proxy == null) {
+                        mStoreApp.startProxy();
+                        throw new ProxyNotRunningException();
+                    } else {
+                        return AppService.getAppsUsingCategory(proxy, mCategory.toString(), mPage++);
+                    }
                 }
-            }
-        })
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Action1<App[]>() {
-            @Override
-            public void call(App[] apps) {
-                if (apps.length == 0) {
-                    throw new NoAppsException();
-                } else {
-                    showApps(apps);
+            })
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Action1<App[]>() {
+                @Override
+                public void call(App[] apps) {
+                    if (apps.length == 0) {
+                        throw new NoAppsException();
+                    } else {
+                        showApps(apps, mStoreApp.getProxy());
+                    }
                 }
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                throwable.printStackTrace();
-                showError(throwable);
-            }
-        });
+            }, new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    throwable.printStackTrace();
+                    showError(throwable);
+                }
+            });
     }
 
     private void showError(Throwable throwable) {
@@ -135,14 +144,10 @@ public class FeaturedAppListFragment extends Fragment {
 
         TextView tvErrorDescription = (TextView) mErrorView.findViewById(R.id.featured_app_list_fragment_text_view_error_description);
         if (throwable instanceof NoAppsException) {
-            //TODO: use R.string
-            tvErrorDescription.setText("No apps were found");
+            tvErrorDescription.setText(R.string.featured_app_list_fragment_no_apps);
         } else {
-            //TODO: better error description
-            tvErrorDescription.setText("Something went wrong");
+            tvErrorDescription.setText(R.string.generic_error);
         }
-
-
 
         mErrorView.findViewById(R.id.featured_app_list_fragment_button_error_retry).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,7 +157,7 @@ public class FeaturedAppListFragment extends Fragment {
         });
     }
 
-    private void showApps(App[] apps) {
+    private void showApps(App[] apps, Proxy proxy) {
         mRecyclerView.setHasFixedSize(true);
 
         int columns = getResources().getConfiguration().screenWidthDp / 490;
@@ -160,7 +165,8 @@ public class FeaturedAppListFragment extends Fragment {
         mRecyclerView.setLayoutManager(gridLayoutManager);
 
         FeaturedAppListAdapter featuredAppListAdapter = new FeaturedAppListAdapter(apps,
-                Glide.with(mActivity), new AdapterItemSelectedListener<App>() {
+                Glide.with(mActivity), proxy,  mStoreApp.getTempCacheDirectory(),
+                new AdapterItemSelectedListener<App>() {
             @Override
             public void onSelected(App item) {
                 Intent appActivity = new Intent(mActivity, AppActivity.class);
@@ -171,6 +177,9 @@ public class FeaturedAppListFragment extends Fragment {
         mRecyclerView.setAdapter(featuredAppListAdapter);
 
         //TODO: load more when bottom reached
+
+        mProgressBar.setVisibility(View.GONE);
+        mErrorView.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 }

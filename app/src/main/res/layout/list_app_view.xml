@@ -37,7 +37,8 @@
             app:srb_numberOfStars="5"
             app:srb_starSize="18dp"
             app:srb_borderColor="#BBBBBB"
-            app:srb_fillColor="#BBBBBB" />
+            app:srb_fillColor="#BBBBBB"
+            app:srb_isIndicator="true"/>
 
     </LinearLayout>
 

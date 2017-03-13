@@ -2,15 +2,25 @@
     <string name="app_name">sTORe</string>
 
 
+    <string name="nav_apps">Apps</string>
+    <string name="nav_updates">Updates</string>
+    <string name="nav_about">About</string>
+
+
     <string name="sad_face">:(</string>
     <string name="retry">Retry</string>
     <string name="stop">Stop</string>
+    <string name="search">Search</string>
+    <string name="cancel">Cancel</string>
+
+
+    <string name="generic_error">Something went wrong</string>
 
 
     <string name="proxy_service_notification_text">TOR proxy is running...</string>
 
 
-    <string name="navigation_search">Search</string>
+    <string name="menu_search">Search</string>
 
 
     <string name="main_activity_category_communication">Communication</string>
@@ -23,6 +33,34 @@
     <string name="proxy_status_activity_proxy_is_not_running">TOR proxy is not running</string>
 
 
-    <string name="featured_app_list_fragment_no_apps">Utilities</string>
+    <string name="app_activity_create_review">Create Review</string>
+    <string name="app_activity_install">Install</string>
+    <string name="app_activity_update">Update</string>
+    <string name="app_activity_reviews_title">Reviews:</string>
+    <string name="app_activity_reviews_show_all"><u>Show all</u></string>
+    <string name="app_activity_reviews_no_reviews">No reviews to show</string>
+
+
+
+    <string name="update_activity_no_updates">No updates needed</string>
+
+
+    <string name="featured_app_list_fragment_no_apps">No apps found</string>
+
+
+    <string name="search_activity_no_apps">No apps found</string>
+
+
+    <string name="search_dialog_title">What are you looking for?</string>
+    <string name="search_dialog_keywords_hint">Star Wars</string>
+
+
+    <string name="create_review_dialog_title">Create Review</string>
+    <string name="create_review_dialog_star_rating">Your rating:</string>
+    <string name="create_review_dialog_description">Your message:</string>
+    <string name="create_review_dialog_creating_review">Creating your review...</string>
+    <string name="create_review_dialog_review_will_show_soon">Your review will appear for this app shortly</string>
+    <string name="create_review_dialog_review_not_created">Something went wrong, your review was not created</string>
+
 
 </resources>

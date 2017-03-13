@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bumptech.glide.RequestManager;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 
 import me.tombailey.store.R;
@@ -21,12 +20,14 @@ import me.tombailey.store.model.Review;
 public class AppReviewListAdapter extends RecyclerView.Adapter<AppReviewListAdapter.AppReviewViewHolder> {
 
     private Review[] mReviews;
-    private RequestManager mRequestManager;
     private AdapterItemSelectedListener<Review> mReviewSelectedListener;
 
-    public AppReviewListAdapter(Review[] reviews, RequestManager requestManager, AdapterItemSelectedListener<Review> reviewSelectedListener) {
+    public AppReviewListAdapter(Review[] reviews) {
+        this(reviews, null);
+    }
+
+    public AppReviewListAdapter(Review[] reviews, AdapterItemSelectedListener<Review> reviewSelectedListener) {
         mReviews = reviews;
-        mRequestManager = requestManager;
         mReviewSelectedListener = reviewSelectedListener;
     }
 
@@ -64,7 +65,9 @@ public class AppReviewListAdapter extends RecyclerView.Adapter<AppReviewListAdap
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mReviewSelectedListener.onSelected(mReview);
+                    if (mReviewSelectedListener != null) {
+                        mReviewSelectedListener.onSelected(mReview);
+                    }
                 }
             });
 

@@ -159,6 +159,7 @@ public class TorConnectionService extends Service {
     }
 
     private int getOnionProxyPort() throws IOException {
+        //TODO: catch runtime for tor is not running
         return mOnionProxyManager.getIPv4LocalHostSocksPort();
     }
 

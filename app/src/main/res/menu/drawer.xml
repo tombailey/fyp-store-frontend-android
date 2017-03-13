@@ -2,8 +2,19 @@
 	<group android:checkableBehavior="single">
 
 		<item
-			android:id="@+id/nav_example1"
-			android:title="TODO:" />
+			android:id="@+id/nav_home"
+			android:title="@string/nav_apps"
+			android:icon="@drawable/ic_smartphone_white_24dp" />
+
+		<item
+			android:id="@+id/nav_updates"
+			android:title="@string/nav_updates"
+			android:icon="@drawable/ic_updates_white_24dp"/>
+
+		<item
+			android:id="@+id/nav_settings"
+			android:title="@string/nav_about"
+			android:icon="@drawable/ic_info_outline_white_24dp"/>
 
 	</group>
 </menu>

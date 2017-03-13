@@ -9,7 +9,14 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.RequestManager;
 
+import java.io.File;
+
 import me.tombailey.store.R;
+import me.tombailey.store.http.Proxy;
+import me.tombailey.store.model.App;
+import me.tombailey.store.rx.service.HttpService;
+import rx.Subscription;
+import rx.functions.Action1;
 
 /**
  * Created by Tom on 28/11/2016.
@@ -17,13 +24,24 @@ import me.tombailey.store.R;
 
 public class AppScreenshotListAdapter extends RecyclerView.Adapter<AppScreenshotListAdapter.AppScreenshotViewHolder> {
 
-    private String[] mScreenshots;
-    private RequestManager mRequestManager;
-    private AdapterItemSelectedListener<String> mScreenshotSelectedListener;
+    private App mApp;
 
-    public AppScreenshotListAdapter(String[] screenshots, RequestManager requestManager, AdapterItemSelectedListener<String> screenshotSelectedListener) {
-        mScreenshots = screenshots;
+    private Proxy mProxy;
+    private File mTempCacheDir;
+
+    private RequestManager mRequestManager;
+    private AdapterItemSelectedListener<File> mScreenshotSelectedListener;
+
+    public AppScreenshotListAdapter(App app, RequestManager requestManager, Proxy proxy,
+                                    File tempCacheDir,
+                                    AdapterItemSelectedListener<File> screenshotSelectedListener) {
+        mApp = app;
+
+        mProxy = proxy;
+        mTempCacheDir = tempCacheDir;
+
         mRequestManager = requestManager;
+
         mScreenshotSelectedListener = screenshotSelectedListener;
     }
 
@@ -35,24 +53,21 @@ public class AppScreenshotListAdapter extends RecyclerView.Adapter<AppScreenshot
 
     @Override
     public void onBindViewHolder(AppScreenshotViewHolder holder, int position) {
-        holder.setScreenshot(mScreenshots[position]);
+        holder.setScreenshotNumber(position);
     }
 
     @Override
     public int getItemCount() {
-        return mScreenshots.length;
-    }
-
-    public void setScreenshots(String[] screenshots) {
-        mScreenshots = screenshots;
-        notifyDataSetChanged();
+        return mApp.getScreenshotCount();
     }
 
     public class AppScreenshotViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView ivScreenshot;
 
-        private String mScreenshot;
+        private int mScreenshotNumber;
+
+        private Subscription mDownloadScreenshot;
 
         public AppScreenshotViewHolder(View itemView) {
             super(itemView);
@@ -60,16 +75,37 @@ public class AppScreenshotListAdapter extends RecyclerView.Adapter<AppScreenshot
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mScreenshotSelectedListener.onSelected(mScreenshot);
+                    mScreenshotSelectedListener.onSelected(new File(mTempCacheDir,
+                            mApp.getId() + "-screenshot-" + mScreenshotNumber + "-.png"));
                 }
             });
-
             ivScreenshot = (ImageView) itemView.findViewById(R.id.list_screenshot_view_image_view_screenshot);
         }
 
-        public void setScreenshot(String screenshot) {
-            mScreenshot = screenshot;
-            mRequestManager.load(screenshot).into(ivScreenshot);
+        public void setScreenshotNumber(int screenshotNumber) {
+            mScreenshotNumber = screenshotNumber;
+
+            if (mDownloadScreenshot != null && !mDownloadScreenshot.isUnsubscribed()) {
+                mDownloadScreenshot.unsubscribe();
+            }
+
+            if (mProxy != null) {
+                mDownloadScreenshot = HttpService.download(mProxy,
+                        mApp.getScreenshotLink(screenshotNumber),
+                        new File(mTempCacheDir, mApp.getId() + "-screenshot-" + screenshotNumber +
+                                ".png"))
+                    .subscribe(new Action1<File>() {
+                        @Override
+                        public void call(File featureGraphicFile) {
+                            mRequestManager.load(featureGraphicFile).into(ivScreenshot);
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
+                    });
+            }
         }
     }
 }

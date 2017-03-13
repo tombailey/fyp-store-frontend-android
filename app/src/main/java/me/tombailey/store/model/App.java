@@ -26,16 +26,21 @@ public class App implements Parcelable {
     };
 
 
-    private static final String ID = "id";
+    private static final String ID = "_id";
+
     private static final String NAME = "name";
     private static final String DESCRIPTION = "description";
-    private static final String FEATURE_GRAPHIC = "featureGraphic";
-    private static final String ICON_LINK = "iconLink";
+
     private static final String DOWNLOAD_COUNT = "downloadCount";
-    private static final String CURRENT_VERSION= "currentVersion";
+
+    private static final String CURRENT_VERSION = "currentVersion";
     private static final String NUMBER = "number";
     private static final String DATE = "date";
-    private static final String SCREENSHOTS = "screenshots";
+
+    private static final String SCREENSHOT_COUNT = "screenshotCount";
+
+    private static final String RATING = "rating";
+
     private static final String CATEGORIES = "categories";
 
 
@@ -43,15 +48,14 @@ public class App implements Parcelable {
     private String name;
     private String description;
 
-    private String iconLink;
-    private String featureGraphicLink;
-
     private long downloadCount;
 
     private long currentVersionNumber;
     private String currentVersionDate;
 
-    private String[] screenshotLinks;
+    private int screenshotCount;
+
+    private double rating;
 
     private String[] categories;
 
@@ -59,12 +63,6 @@ public class App implements Parcelable {
 
 
     public static App fromJson(JSONObject jsonObject) throws JSONException {
-        JSONArray screenshotsJson = jsonObject.getJSONArray(SCREENSHOTS);
-        String[] screenshots = new String[screenshotsJson.length()];
-        for (int index = 0; index < screenshotsJson.length(); index++) {
-            screenshots[index] = screenshotsJson.getString(index);
-        }
-
         JSONArray categoriesJson = jsonObject.getJSONArray(CATEGORIES);
         String[] categories = new String[categoriesJson.length()];
         for (int index = 0; index < categoriesJson.length(); index++) {
@@ -74,46 +72,42 @@ public class App implements Parcelable {
         JSONObject currentVersion = jsonObject.getJSONObject(CURRENT_VERSION);
 
         return new App(jsonObject.getString(ID), jsonObject.getString(NAME),
-                jsonObject.getString(DESCRIPTION), jsonObject.getString(FEATURE_GRAPHIC),
-                jsonObject.getString(ICON_LINK), jsonObject.getLong(DOWNLOAD_COUNT),
-                currentVersion.getLong(NUMBER), currentVersion.getString(DATE), screenshots,
-                categories);
+                jsonObject.getString(DESCRIPTION), jsonObject.getLong(DOWNLOAD_COUNT),
+                currentVersion.getLong(NUMBER), currentVersion.getString(DATE),
+                jsonObject.getInt(SCREENSHOT_COUNT), jsonObject.getDouble(RATING), categories);
     }
 
 
     public App(Parcel parcel) {
-        this(parcel.readString(), parcel.readString(), parcel.readString(), parcel.readString(),
-                parcel.readString(), parcel.readLong(), parcel.readLong(), parcel.readString(),
-                parcel.createStringArray(), parcel.createStringArray(),
-                parcel.createTypedArray(Review.CREATOR));
+        this(parcel.readString(), parcel.readString(), parcel.readString(), parcel.readLong(),
+                parcel.readLong(), parcel.readString(), parcel.readInt(), parcel.readDouble(),
+                parcel.createStringArray(), parcel.createTypedArray(Review.CREATOR));
     }
 
-    public App(String id, String name, String description, String featureGraphicLink,
-                String iconLink, long downloadCount, long currentVersionNumber, String currentVersionDate,
-                String[] screenshotLinks, String[] categories) {
-        this(id, name, description, featureGraphicLink, iconLink, downloadCount,
-                currentVersionNumber, currentVersionDate, screenshotLinks, categories,
-                new Review[0]);
+    public App(String id, String name, String description, long downloadCount,
+               long currentVersionNumber, String currentVersionDate, int screenshotCount,
+               double rating, String[] categories) {
+        this(id, name, description, downloadCount, currentVersionNumber, currentVersionDate,
+                screenshotCount, rating, categories, new Review[0]);
     }
 
-    public App(String id, String name, String description, String featureGraphicLink,
-               String iconLink, long downloadCount, long currentVersionNumber, String currentVersionDate,
-               String[] screenshotLinks, String[] categories, Review[] reviews) {
+    public App(String id, String name, String description, long downloadCount,
+               long currentVersionNumber, String currentVersionDate, int screenshotCount,
+               double rating, String[] categories, Review[] reviews) {
         this.id = id;
         this.name = name;
         this.description = description;
-
-        this.featureGraphicLink = featureGraphicLink;
-        this.iconLink = iconLink;
 
         this.downloadCount = downloadCount;
 
         this.currentVersionNumber = currentVersionNumber;
         this.currentVersionDate = currentVersionDate;
 
-        this.screenshotLinks = screenshotLinks;
+        this.screenshotCount = screenshotCount;
 
         this.categories = categories;
+
+        this.rating = rating;
 
         this.reviews = reviews;
     }
@@ -132,12 +126,16 @@ public class App implements Parcelable {
         return description;
     }
 
+    public String getDownloadLink() {
+        return "http://q6yl3es3js7j3gm3.onion/api/applications/" + id + "/versions/" + currentVersionNumber;
+    }
+
     public String getIconLink() {
-        return iconLink;
+        return "http://q6yl3es3js7j3gm3.onion/api/applications/" + id + "/icon";
     }
 
     public String getFeatureGraphicLink() {
-        return featureGraphicLink;
+        return "http://q6yl3es3js7j3gm3.onion/api/applications/" + id + "/featureGraphic";
     }
 
     public long getDownloadCount() {
@@ -152,8 +150,16 @@ public class App implements Parcelable {
         return currentVersionDate;
     }
 
-    public String[] getScreenshotLinks() {
-        return screenshotLinks;
+    public double getRating() {
+        return rating;
+    }
+
+    public String getScreenshotLink(int screenshotNumber) {
+        return "http://q6yl3es3js7j3gm3.onion/api/applications/" + id + "/screenshots/" + screenshotNumber;
+    }
+
+    public int getScreenshotCount() {
+        return screenshotCount;
     }
 
     public String[] getCategories() {
@@ -179,15 +185,13 @@ public class App implements Parcelable {
         parcel.writeString(name);
         parcel.writeString(description);
 
-        parcel.writeString(iconLink);
-        parcel.writeString(featureGraphicLink);
-
         parcel.writeLong(downloadCount);
 
         parcel.writeLong(currentVersionNumber);
         parcel.writeString(currentVersionDate);
 
-        parcel.writeStringArray(screenshotLinks);
+        parcel.writeInt(screenshotCount);
+        parcel.writeDouble(rating);
 
         parcel.writeStringArray(categories);
 
