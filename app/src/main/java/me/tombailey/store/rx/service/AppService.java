@@ -39,6 +39,14 @@ public class AppService {
     private static final String HOST_NAME = "q6yl3es3js7j3gm3.onion";
 
 
+    /**
+     * Retrieves the App associated with the id given
+     * @param proxy a Proxy instance with which network connections can be established
+     * @param id the id of the application to retrieve
+     * @return the App associated with the id given
+     * @throws IOException if a network error occurs
+     * @throws JSONException if the network response can not be mapped
+     */
     private static App getAppById(final Proxy proxy, final String id) throws IOException, JSONException {
         Request request = new Request.Builder()
                 .proxy(proxy)
@@ -51,6 +59,12 @@ public class AppService {
         return App.fromJson(jsonResponse.getJSONObject("data"));
     }
 
+    /**
+     * Retrieves the App associated with the id given
+     * @param proxy a Proxy instance with which network connections can be established
+     * @param id the id of the application to retrieve
+     * @return an Observable that will emit the App associated with the id given or an error
+     */
     public static Observable<App> getApp(final Proxy proxy, final String id) {
         return Observable.create(new Observable.OnSubscribe<App>() {
             @Override
@@ -66,6 +80,14 @@ public class AppService {
         .observeOn(AndroidSchedulers.mainThread());
     }
 
+    /**
+     * Retrieves an array of Apps related to the keywords on the specified page
+     * @param proxy a Proxy instance with which network connections can be established
+     * @param keywords the keywords to use when finding Apps
+     * @param page the page of results to be retrieved
+     * @return an Observable that will emit an array of Apps related to the keywords on the
+     * specified page or an error
+     */
     public static Observable<App[]> getAppsUsingSearch(final Proxy proxy, final String keywords, final int page) {
         return Observable.create(new Observable.OnSubscribe<App[]>() {
             @Override
@@ -97,6 +119,14 @@ public class AppService {
         .observeOn(AndroidSchedulers.mainThread());
     }
 
+    /**
+     * Retrieves an array of Apps according to the category and page specified
+     * @param proxy a Proxy instance with which network connections can be established
+     * @param category the category to retrieve Apps from
+     * @param page the page of results to be retrieved
+     * @return an Observable that will emit an array of Apps according to the category and page
+     * specified or an error
+     */
     public static Observable<App[]> getAppsUsingCategory(final Proxy proxy, final String category, final int page) {
         return Observable.create(new Observable.OnSubscribe<App[]>() {
             @Override
@@ -129,10 +159,22 @@ public class AppService {
         .observeOn(AndroidSchedulers.mainThread());
     }
 
+    /**
+     * Retrieves an array of Reviews for the given App
+     * @param proxy a Proxy instance with which network connections can be established
+     * @param app the App to retrieve Reviews for
+     * @return an Observable that will emit an array of Reviews for the given app or error
+     */
     public static Observable<Review[]> getReviewsForApp(final Proxy proxy, final App app) {
         return getReviewsForApp(proxy, app.getId());
     }
 
+    /**
+     * Retrieves an array of Reviews for the given app
+     * @param proxy a Proxy instance with which network connections can be established
+     * @param appId the appId for the App to retrieve Reviews for
+     * @return an Observable that will emit an array of Reviews for the given app or an error
+     */
     public static Observable<Review[]> getReviewsForApp(final Proxy proxy, final String appId) {
         return Observable.create(new Observable.OnSubscribe<Review[]>() {
             @Override
@@ -163,10 +205,25 @@ public class AppService {
         .observeOn(AndroidSchedulers.mainThread());
     }
 
+    /**
+     * Downloads the APK for the App specified to the File location specified
+     * @param proxy a Proxy instance with which network connections can be established
+     * @param app the App to download
+     * @param saveTo the File location to save the APK to
+     * @return an Observable that will emit the File location that the APK was saved to or an error
+     */
     public static Observable<File> downloadApp(final Proxy proxy, final App app, final File saveTo) {
         return HttpService.download(proxy, app.getDownloadLink(), saveTo);
     }
 
+    /**
+     * Creates a new Review for the App specified
+     * @param proxy a Proxy instance with which network connections can be established
+     * @param appId the appId for the App to leave a Review for
+     * @param description the description for the Review to create
+     * @param stars the stars for the Review to create
+     * @return an Observable that will emit true if the review is created or an error otherwise
+     */
     public static Observable<Boolean> addReviewForApp(final Proxy proxy, final String appId,
                                                       final String description, final int stars) {
         return Observable.create(new Observable.OnSubscribe<Boolean>() {
@@ -186,7 +243,6 @@ public class AppService {
                     Response response = request.execute();
 
                     if (response.getStatusCode() != HttpURLConnection.HTTP_CREATED) {
-                        //TODO: use custom exception
                         throw new IOException("review not accepted");
                     }
 
@@ -201,10 +257,11 @@ public class AppService {
     }
 
     /**
-     * TODO:
-     * @param realm TODO:
-     * @param packageManager TODO:
-     * @return TODO:
+     * Retrieves a list of InstalledApps that are actually installed on the device
+     * @param realm a realm instance with which InstalledApps will be retrieved. The realm instance
+     *              will not be closed
+     * @param packageManager a PackageManager to verify installed applications with
+     * @return a list of InstalledApps that are actually installed on the device
      */
     public static List<InstalledApp> getInstalledApps(final Realm realm,
                                                       final PackageManager packageManager) {
@@ -229,8 +286,8 @@ public class AppService {
     }
 
     /**
-     * TODO:
-     * @param realm a realm instance with which InstalledApps will be retrieved. The realm instance
+     * Removes an InstalledApp from Realm
+     * @param realm a realm instance with which the InstalledApp will be removed. The realm instance
      *              will not be closed
      * @param installedApp the InstalledApp to remove from realm
      */
@@ -245,12 +302,14 @@ public class AppService {
     }
 
     /**
-     * TODO:
+     * Retrieves a List of InstalledApps that have been installed by the store. Note that some apps
+     * may have been installed since their installation was recorded; use PackageManager to verify
+     * they are still installed
      * @param realm a realm instance with which InstalledApps will be retrieved. The realm instance
      *              will not be closed
-     * @return the apps that have been installed by the store. Note that some apps may have been
-     * installed since their installation was recorded; use PackageManager to verify they are still
-     * installed
+     * @return a List of InstalledApps that have been installed by the store. Note that some apps
+     * may have been installed since their installation was recorded; use PackageManager to verify
+     * they are still installed
      */
     private static List<InstalledApp> getAppsInstalledByStore(Realm realm) {
         RealmResults<InstalledApp> installedApps = realm.where(InstalledApp.class).findAll();
@@ -259,13 +318,11 @@ public class AppService {
     }
 
     /**
-     * TODO:
-     * @param proxy TODO:
-     * @param realmConfiguration TODO:
-     * @param packageManager TODO:
-     * @return the apps that have been installed by the store. Note that some apps may have been
-     * installed since their installation was recorded; use PackageManager to verify they are still
-     * installed
+     * Retrieves a List of Apps that should be updated
+     * @param proxy a Proxy instance with which network connections can be established
+     * @param realmConfiguration a RealmConfiguration to create a Realm instance with
+     * @param packageManager a PackageManager to verify installed applications with
+     * @return an Observable that will emit a List of Apps that need updates or an error
      */
     public static Observable<List<App>> checkForUpdates(final Proxy proxy,
                                                         final RealmConfiguration realmConfiguration,
@@ -298,12 +355,10 @@ public class AppService {
     }
 
     /**
-     * TODO:
-     * @param realmConfiguration TODO:
-     * @param app TODO:
-     * @return the apps that have been installed by the store. Note that some apps may have been
-     * installed since their installation was recorded; use PackageManager to verify they are still
-     * installed
+     * Registers an InstalledApp for the app specified
+     * @param realmConfiguration a RealmConfiguration to create a Realm instance with
+     * @param app the App to register an InstalledApp for
+     * @return an Observable that will emit true if the review is created or an error otherwise
      */
     public static Observable<Boolean> registerAppInstall(final RealmConfiguration realmConfiguration,
                                                          final App app) {
