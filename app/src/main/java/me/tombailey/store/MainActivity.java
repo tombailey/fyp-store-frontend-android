@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                     dl.closeDrawers();
                 } else if (item.getItemId() == R.id.nav_updates) {
                     startActivity(new Intent(MainActivity.this, UpdatesActivity.class));
-                } else if (item.getItemId() == R.id.nav_settings) {
+                } else if (item.getItemId() == R.id.nav_about) {
                     startActivity(new Intent(MainActivity.this, AboutActivity.class));
                 } else {
                     return false;
