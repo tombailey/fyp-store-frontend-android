@@ -168,7 +168,7 @@ public class TorConnectionService extends Service {
         PendingIntent stopProxyIntent = getStopProxyPendingIntent();
 
         Notification proxyNotification = new NotificationCompat.Builder(this)
-                .setSmallIcon(com.msopentech.thali.toronionproxy.android.R.drawable.ic_launcher)
+                .setSmallIcon(R.drawable.ic_router_white_24dp)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.proxy_service_notification_text))
                 .setContentIntent(proxyStatusIntent)
