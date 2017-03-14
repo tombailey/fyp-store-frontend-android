@@ -73,8 +73,6 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
 
-        //TODO: show proxy status menu item
-
         final DrawerLayout dl = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navigationView = (NavigationView) findViewById(R.id.activity_main_navigation_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -86,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(MainActivity.this, UpdatesActivity.class));
                 } else if (item.getItemId() == R.id.nav_about) {
                     startActivity(new Intent(MainActivity.this, AboutActivity.class));
+                } else if (item.getItemId() == R.id.nav_proxy_status) {
+                    startActivity(new Intent(MainActivity.this, ProxyStatusActivity.class));
                 } else {
                     return false;
                 }

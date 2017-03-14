@@ -16,5 +16,10 @@
 			android:title="@string/nav_about"
 			android:icon="@drawable/ic_info_outline_white_24dp"/>
 
+		<item
+			android:id="@+id/nav_proxy_status"
+			android:title="@string/nav_proxy_status"
+			android:icon="@drawable/ic_router_white_24dp"/>
+
 	</group>
 </menu>
