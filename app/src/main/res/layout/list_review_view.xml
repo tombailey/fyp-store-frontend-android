@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             app:srb_numberOfStars="5"
+            app:srb_minNumberOfStars="1"
             app:srb_starSize="18dp"
             app:srb_borderColor="#BBBBBB"
             app:srb_fillColor="#BBBBBB" />
