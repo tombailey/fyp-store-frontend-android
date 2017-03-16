@@ -38,6 +38,7 @@ dependencies {
     compile 'com.android.support:design:25.1.0'
 
     compile(name: 'sTOReProxyConnectivity', ext: 'aar')
+    compile(name: 'simpleratingbar-release', ext: 'aar')
 
     compile(name: 'ThaliOnionProxyAndroid-release', ext: 'aar')
     compile 'org.slf4j:slf4j-api:1.7.7'
@@ -45,8 +46,6 @@ dependencies {
 
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.6'
-
-    compile 'com.iarcuschin:simpleratingbar:0.1.1'
 
     compile 'com.github.bumptech.glide:glide:3.7.0'
 
