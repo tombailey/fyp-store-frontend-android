@@ -23,8 +23,8 @@
         app:srb_numberOfStars="5"
         app:srb_minNumberOfStars="1"
         app:srb_starSize="35dp"
-        app:srb_borderColor="#BBBBBB"
-        app:srb_fillColor="#BBBBBB"
+        app:srb_borderColor="#FFD700"
+        app:srb_fillColor="#FFD700"
         app:srb_stepSize="1"/>
 
     <TextView
