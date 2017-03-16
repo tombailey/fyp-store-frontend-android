@@ -36,6 +36,7 @@ import me.tombailey.store.model.InstalledApp;
 import me.tombailey.store.model.Review;
 import me.tombailey.store.rx.service.AppService;
 import me.tombailey.store.rx.service.HttpService;
+import me.tombailey.store.util.NavigationUtil;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
@@ -111,7 +112,7 @@ public class AppActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                NavigationUtil.goBackToHome(AppActivity.this);
             }
         });
 
@@ -132,15 +133,42 @@ public class AppActivity extends AppCompatActivity {
         });
         srb.setRating((float) mApp.getRating());
 
+
         mInstallOrUpdate = (Button) findViewById(R.id.app_activity_button_install);
-        mInstallOrUpdate.setText(isUpdateNeeded() ?
-                R.string.app_activity_update : R.string.app_activity_install);
-        mInstallOrUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                downloadAndInstallApp();
-            }
-        });
+        if (isAlreadyInstalled() && !isUpdateNeeded()) {
+            mInstallOrUpdate.setText(R.string.app_activity_open);
+            mInstallOrUpdate.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent launchIntent = getLaunchIntent();
+                    if (launchIntent == null) {
+                        Toast.makeText(AppActivity.this,
+                                getString(R.string.app_activity_app_no_longer_installed),
+                                Toast.LENGTH_SHORT).show();
+
+                        mInstallOrUpdate.setText(isUpdateNeeded() ?
+                                R.string.app_activity_update : R.string.app_activity_install);
+                        mInstallOrUpdate.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                downloadAndInstallApp();
+                            }
+                        });
+                    } else {
+                        startActivity(launchIntent);
+                    }
+                }
+            });
+        } else {
+            mInstallOrUpdate.setText(isUpdateNeeded() ?
+                    R.string.app_activity_update : R.string.app_activity_install);
+            mInstallOrUpdate.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    downloadAndInstallApp();
+                }
+            });
+        }
 
         findViewById(R.id.app_activity_button_create_review).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,6 +189,35 @@ public class AppActivity extends AppCompatActivity {
         showIcon();
         showScreenshots();
         getReviews();
+    }
+
+    private boolean isAlreadyInstalled() {
+        //TODO: move realm off UI thread
+        Realm realm = mStoreApp.getRealm();
+
+        InstalledApp installedApp = realm.where(InstalledApp.class)
+                .equalTo("mAppId", mApp.getId())
+                .findFirst();
+
+        boolean isInstalled = installedApp != null;
+        realm.close();
+        return isInstalled;
+    }
+
+    private Intent getLaunchIntent() {
+        //TODO: move realm off UI thread
+        Realm realm = mStoreApp.getRealm();
+
+        InstalledApp installedApp = realm.where(InstalledApp.class)
+                .equalTo("mAppId", mApp.getId())
+                .findFirst();
+
+        Intent launchIntent = null;
+        if (installedApp != null) {
+            launchIntent = getPackageManager().getLaunchIntentForPackage(installedApp.getAppId());
+        }
+        realm.close();
+        return launchIntent;
     }
 
     private boolean isUpdateNeeded() {

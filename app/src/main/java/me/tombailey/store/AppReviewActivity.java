@@ -11,6 +11,7 @@ import android.view.View;
 
 import me.tombailey.store.adapter.AppReviewListAdapter;
 import me.tombailey.store.model.App;
+import me.tombailey.store.util.NavigationUtil;
 
 /**
  * Created by tomba on 09/03/2017.
@@ -47,7 +48,7 @@ public class AppReviewActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+                NavigationUtil.goBackToHome(AppReviewActivity.this);
             }
         });
 

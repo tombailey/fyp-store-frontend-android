@@ -22,6 +22,9 @@
     <string name="proxy_service_notification_text">TOR proxy is running...</string>
 
 
+    <string name="download_service_notification_text">An app has been downloaded. Tap to install...</string>
+
+
     <string name="menu_search">Search</string>
 
 
@@ -38,9 +41,11 @@
     <string name="app_activity_create_review">Create Review</string>
     <string name="app_activity_install">Install</string>
     <string name="app_activity_update">Update</string>
+    <string name="app_activity_open">Open</string>
     <string name="app_activity_reviews_title">Reviews:</string>
     <string name="app_activity_reviews_show_all"><u>Show all</u></string>
     <string name="app_activity_reviews_no_reviews">No reviews to show</string>
+    <string name="app_activity_app_no_longer_installed">This app doesn\'t seem to be installed anymore</string>
 
 
 
