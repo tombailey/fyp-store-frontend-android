@@ -49,7 +49,14 @@ public class UpdatesActivity extends AppCompatActivity {
 
 
         mRecyclerView = (RecyclerView) findViewById(R.id.update_activity_recycler_view);
-        mNoUpdatesView = findViewById(R.id.update_activity_text_view_no_updates);
+        mNoUpdatesView = findViewById(R.id.update_activity_linear_layout_no_updates);
+        mNoUpdatesView.findViewById(R.id.update_activity_button_no_updates_refresh).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkForUpdates();
+            }
+        });
+
         mProgressView = findViewById(R.id.update_activity_progress_bar);
         mErrorView = findViewById(R.id.update_activity_progress_bar);
 
