@@ -123,6 +123,13 @@ public class AppActivity extends AppCompatActivity {
         tvDescription.setText(mApp.getDescription());
 
         SimpleRatingBar srb = (SimpleRatingBar) findViewById(R.id.app_activity_simple_rating_bar);
+        srb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View scrollView = findViewById(R.id.app_activity_scroll_view);
+                scrollView.scrollTo(0, scrollView.getHeight());
+            }
+        });
         srb.setRating((float) mApp.getRating());
 
         mInstallOrUpdate = (Button) findViewById(R.id.app_activity_button_install);
