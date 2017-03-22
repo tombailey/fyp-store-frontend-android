@@ -22,6 +22,10 @@
     <string name="proxy_service_notification_text">TOR proxy is running...</string>
 
 
+    <string name="download_service_download_failed_notification">Something went wrong, the app was not downloaded.</string>
+    <string name="download_service_download_complete_notification">The app is downloaded, touch to install.</string>
+
+
     <string name="review_service_review_not_created_notification">Something went wrong, your review was not created.</string>
     <string name="review_service_created_review_notification">Your reviewed was created.</string>
 
@@ -47,6 +51,7 @@
     <string name="app_activity_reviews_show_all"><u>Show all</u></string>
     <string name="app_activity_reviews_no_reviews">No reviews to show</string>
     <string name="app_activity_app_no_longer_installed">This app doesn\'t seem to be installed anymore</string>
+    <string name="app_activity_app_downloading">Downloading this app...</string>
 
 
 

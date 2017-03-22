@@ -1,13 +1,10 @@
 package me.tombailey.store;
 
-import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -37,6 +34,7 @@ import me.tombailey.store.model.InstalledApp;
 import me.tombailey.store.model.Review;
 import me.tombailey.store.rx.service.AppService;
 import me.tombailey.store.rx.service.HttpService;
+import me.tombailey.store.service.AppDownloadService;
 import me.tombailey.store.service.AppReviewService;
 import me.tombailey.store.util.NavigationUtil;
 import rx.Observable;
@@ -153,7 +151,7 @@ public class AppActivity extends AppCompatActivity {
                         mInstallOrUpdate.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                downloadAndInstallApp();
+                                downloadApp();
                             }
                         });
                     } else {
@@ -167,7 +165,7 @@ public class AppActivity extends AppCompatActivity {
             mInstallOrUpdate.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    downloadAndInstallApp();
+                    downloadApp();
                 }
             });
         }
@@ -235,64 +233,15 @@ public class AppActivity extends AppCompatActivity {
         return updateNeeded;
     }
 
-    private void downloadAndInstallApp() {
-        if (mDownloadAppSubscription != null && !mDownloadAppSubscription.isUnsubscribed()) {
-            mDownloadAppSubscription.unsubscribe();
-        }
+    private void downloadApp() {
+        Toast.makeText(AppActivity.this, R.string.app_activity_app_downloading, Toast.LENGTH_LONG).show();
 
-        final ProgressDialog progressDialog = new ProgressDialog(AppActivity.this);
-        progressDialog.setMessage("Installing " + mApp.getName() + "...");
-        progressDialog.show();
-
-        mDownloadAppSubscription = mStoreApp.subscribeForProxy().flatMap(new Func1<Proxy, Observable<File>>() {
-            @Override
-            public Observable<File> call(Proxy proxy) {
-                if (proxy == null) {
-                    throw new ProxyNotRunningException();
-                } else {
-                    return downloadApp(proxy);
-                }
-            }
-        }).subscribe(new Action1<File>() {
-            @Override
-            public void call(File apk) {
-                progressDialog.dismiss();
-                installApp(apk);
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                throwable.printStackTrace();
-
-                //TODO: handle apk not downloading
-            }
-        });
-    }
-
-    private Observable<File> downloadApp(Proxy proxy) {
-        File saveTo =
-                new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                        mApp.getName() + ".apk");
-        return AppService.downloadApp(proxy, mApp, saveTo);
-    }
-
-    private void installApp(final File apk) {
-        AppService.registerAppInstall(mStoreApp.getRealmConfiguration(), mApp).subscribe(new Action1<Boolean>() {
-            @Override
-            public void call(Boolean installRegistered) {
-                mInstallOrUpdate.setText(R.string.app_activity_install);
-
-                Intent install = new Intent(Intent.ACTION_VIEW);
-                install.setDataAndType(Uri.fromFile(apk), "application/vnd.android.package-archive");
-                startActivity(install);
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                //TODO: handle
-                throwable.printStackTrace();
-            }
-        });
+        Intent downloadAppInBackgroundIntent = new Intent();
+        downloadAppInBackgroundIntent.setComponent(
+                new ComponentName("me.tombailey.store", "me.tombailey.store.service.AppDownloadService"));
+        downloadAppInBackgroundIntent.setAction(AppDownloadService.DOWNLOAD_APP);
+        downloadAppInBackgroundIntent.putExtra(AppDownloadService.APP, mApp);
+        startService(downloadAppInBackgroundIntent);
     }
 
     private void showCreateReviewDialog() {

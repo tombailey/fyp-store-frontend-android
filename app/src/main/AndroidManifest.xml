@@ -31,6 +31,8 @@
             android:exported="true" />
         <service android:name=".service.AppReviewService"
             android:exported="false"/>
+        <service android:name=".service.AppDownloadService"
+            android:exported="false"/>
 
     </application>
 
