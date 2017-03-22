@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.io.File;
@@ -17,6 +18,7 @@ import me.tombailey.store.http.Proxy;
 import me.tombailey.store.http.Request;
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 import rx.subjects.ReplaySubject;
 
 /**
@@ -26,6 +28,7 @@ import rx.subjects.ReplaySubject;
 public class StoreApp extends Application {
 
     private static final String LOG_TAG = StoreApp.class.getName();
+    private static final String NEXT_NOTIFICATION_ID =  "next notification id";
 
 
     private RealmConfiguration mRealmConfiguration;
@@ -124,12 +127,34 @@ public class StoreApp extends Application {
         return mProxyBehaviorSubject;
     }
 
+    public Observable<Proxy> subscribeForNextProxyUpdate() {
+        PublishSubject<Proxy> proxyPublishSubject = PublishSubject.create();
+        mProxyReplaySubject.subscribe(proxyPublishSubject);
+        return proxyPublishSubject.take(1);
+    }
+
+    public int getUniqueNotificationId() {
+        SharedPreferences sharedPreferences = getSharedPreferences(getPackageName(), MODE_PRIVATE);
+
+        int nextId = sharedPreferences.getInt(NEXT_NOTIFICATION_ID, 1);
+        if (nextId == Integer.MAX_VALUE) {
+            nextId = 0;
+        }
+
+        sharedPreferences.edit()
+                .putInt(NEXT_NOTIFICATION_ID, ++nextId)
+                .commit();
+
+        return nextId;
+    }
+
     protected void subscribeForProxyUpdates() {
         IntentFilter proxyIntentFilter = new IntentFilter();
         proxyIntentFilter.addAction("me.tombailey.store.PROXY_STATUS_UPDATE");
 
         if (mProxyBroadReceiver == null) {
             mProxyReplaySubject = ReplaySubject.create(1);
+
             mProxyBehaviorSubject = BehaviorSubject.create();
             mProxyReplaySubject.subscribe(mProxyBehaviorSubject);
 

@@ -22,7 +22,8 @@
     <string name="proxy_service_notification_text">TOR proxy is running...</string>
 
 
-    <string name="download_service_notification_text">An app has been downloaded. Tap to install...</string>
+    <string name="review_service_review_not_created_notification">Something went wrong, your review was not created.</string>
+    <string name="review_service_created_review_notification">Your reviewed was created.</string>
 
 
     <string name="menu_search">Search</string>
@@ -67,8 +68,6 @@
     <string name="create_review_dialog_star_rating">Your rating:</string>
     <string name="create_review_dialog_description">Your message:</string>
     <string name="create_review_dialog_creating_review">Creating your review...</string>
-    <string name="create_review_dialog_review_will_show_soon">Your review will appear for this app shortly</string>
-    <string name="create_review_dialog_review_not_created">Something went wrong, your review was not created</string>
 
 
 </resources>

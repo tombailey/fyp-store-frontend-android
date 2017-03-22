@@ -219,6 +219,19 @@ public class AppService {
     /**
      * Creates a new Review for the App specified
      * @param proxy a Proxy instance with which network connections can be established
+     * @param app the App to leave a Review for
+     * @param description the description for the Review to create
+     * @param stars the stars for the Review to create
+     * @return an Observable that will emit true if the review is created or an error otherwise
+     */
+    public static Observable<Boolean> addReviewForApp(final Proxy proxy, final App app,
+                                                      final String description, final int stars) {
+        return addReviewForApp(proxy, app.getId(), description, stars);
+    }
+
+    /**
+     * Creates a new Review for the App specified
+     * @param proxy a Proxy instance with which network connections can be established
      * @param appId the appId for the App to leave a Review for
      * @param description the description for the Review to create
      * @param stars the stars for the Review to create

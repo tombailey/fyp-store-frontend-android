@@ -1,6 +1,7 @@
 package me.tombailey.store;
 
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -36,6 +37,7 @@ import me.tombailey.store.model.InstalledApp;
 import me.tombailey.store.model.Review;
 import me.tombailey.store.rx.service.AppService;
 import me.tombailey.store.rx.service.HttpService;
+import me.tombailey.store.service.AppReviewService;
 import me.tombailey.store.util.NavigationUtil;
 import rx.Observable;
 import rx.Subscription;
@@ -321,32 +323,15 @@ public class AppActivity extends AppCompatActivity {
     }
 
     private void createReview(final String description, final int stars) {
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setCancelable(false);
-        progressDialog.setMessage(getString(R.string.create_review_dialog_creating_review));
-        progressDialog.show();
+        Toast.makeText(AppActivity.this, R.string.create_review_dialog_creating_review, Toast.LENGTH_LONG).show();
 
-        mStoreApp.subscribeForProxy().flatMap(new Func1<Proxy, Observable<Boolean>>() {
-            @Override
-            public Observable<Boolean> call(Proxy proxy) {
-                return AppService.addReviewForApp(proxy, mApp.getId(), description, stars);
-            }
-        }).subscribe(new Action1<Boolean>() {
-            @Override
-            public void call(Boolean reviewSuccessful) {
-                progressDialog.dismiss();
-                Toast.makeText(AppActivity.this, R.string.create_review_dialog_review_will_show_soon,
-                        Toast.LENGTH_LONG).show();
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                throwable.printStackTrace();
-                progressDialog.dismiss();
-
-                Toast.makeText(AppActivity.this, R.string.create_review_dialog_review_not_created, Toast.LENGTH_LONG).show();
-            }
-        });
+        Intent createReviewInBackgroundIntent = new Intent();
+        createReviewInBackgroundIntent.setComponent(
+                new ComponentName("me.tombailey.store", "me.tombailey.store.service.AppReviewService"));
+        createReviewInBackgroundIntent.putExtra(AppReviewService.APP, mApp);
+        createReviewInBackgroundIntent.putExtra(AppReviewService.DESCRIPTION, description);
+        createReviewInBackgroundIntent.putExtra(AppReviewService.STARS, stars);
+        startService(createReviewInBackgroundIntent);
     }
 
     private void showIcon() {
