@@ -276,26 +276,36 @@ public class AppService {
      * @param packageManager a PackageManager to verify installed applications with
      * @return a list of InstalledApps that are actually installed on the device
      */
-    public static List<InstalledApp> getInstalledApps(final Realm realm,
+    private static List<InstalledApp> getInstalledApps(final Realm realm,
                                                       final PackageManager packageManager) {
-            List<InstalledApp> appsStoreInstalled = getAppsInstalledByStore(realm);
-            List<ApplicationInfo> appsCurrentlyInstalled =
-                    packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
+        removeUninstalledInstalledAppsFromRealm(realm, packageManager);
+        return getAppsInstalledByStore(realm);
+    }
 
-            for (InstalledApp appStoreInstalled : appsStoreInstalled) {
-                boolean stillInstalled = false;
-                for (ApplicationInfo appInfo : appsCurrentlyInstalled) {
-                    if (appStoreInstalled.getAppId().equals(appInfo.packageName)) {
-                        stillInstalled = true;
-                    }
-                }
+    /**
+     * Removes InstalledApps from Realm which are no longer installed on the device
+     * @param realm a realm instance with which the InstalledApps will be removed. The realm instance
+     *              will not be closed
+     * @param packageManager a PackageManager to verify installed applications with
+     */
+    private static void removeUninstalledInstalledAppsFromRealm(Realm realm,
+                                                                PackageManager packageManager) {
+        List<InstalledApp> installedApps = getAppsInstalledByStore(realm);
+        List<ApplicationInfo> appsCurrentlyInstalled =
+                packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
 
-                if (!stillInstalled) {
-                    removeInstalledAppFromRealm(realm, appStoreInstalled);
-                    appsStoreInstalled.remove(appStoreInstalled);
+        for (InstalledApp installedApp : installedApps) {
+            boolean stillInstalled = false;
+            for (ApplicationInfo appInfo : appsCurrentlyInstalled) {
+                if (installedApp.getAppId().equals(appInfo.packageName)) {
+                    stillInstalled = true;
                 }
             }
-            return appsStoreInstalled;
+
+            if (!stillInstalled) {
+                removeInstalledAppFromRealm(realm, installedApp);
+            }
+        }
     }
 
     /**
