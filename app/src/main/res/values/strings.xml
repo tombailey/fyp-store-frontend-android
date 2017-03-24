@@ -55,6 +55,7 @@
 
 
 
+    <string name="update_activity_checking_for_updates">Checking for updates</string>
     <string name="update_activity_no_updates">No updates needed</string>
 
 

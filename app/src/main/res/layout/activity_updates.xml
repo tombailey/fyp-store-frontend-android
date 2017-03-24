@@ -21,11 +21,26 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ProgressBar
-                android:id="@+id/update_activity_progress_bar"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/update_activity_linear_layout_progress"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
+                android:orientation="vertical">
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/update_activity_checking_for_updates"
+                    android:textSize="22sp"/>
+
+            </LinearLayout>
+
+
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/update_activity_recycler_view"
