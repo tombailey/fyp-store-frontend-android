@@ -58,7 +58,7 @@ public class UpdatesActivity extends AppCompatActivity {
         });
 
         mProgressView = findViewById(R.id.update_activity_linear_layout_progress);
-        mErrorView = findViewById(R.id.update_activity_progress_bar);
+        mErrorView = findViewById(R.id.update_activity_linear_layout_error);
 
 
         init();
