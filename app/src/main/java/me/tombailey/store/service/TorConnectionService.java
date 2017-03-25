@@ -18,6 +18,8 @@ import java.io.IOException;
 import me.tombailey.store.ProxyStatusActivity;
 import me.tombailey.store.R;
 
+import static me.tombailey.store.StoreApp.PROXY_RUNNING_NOTIFICATION_ID;
+
 /**
  * Created by tomba on 23/01/2017.
  */
@@ -38,8 +40,6 @@ public class TorConnectionService extends Service {
 
 
     private static final String LOG_TAG = TorConnectionService.class.getName();
-
-    private static final int PROXY_NOTIFICATION_ID = 42;
 
 
     private OnionProxyManager mOnionProxyManager;
@@ -177,7 +177,7 @@ public class TorConnectionService extends Service {
                 .build();
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
-                .notify(PROXY_NOTIFICATION_ID, proxyNotification);
+                .notify(PROXY_RUNNING_NOTIFICATION_ID, proxyNotification);
     }
 
     private PendingIntent getProxyStatusPendingIntent() {
@@ -194,7 +194,7 @@ public class TorConnectionService extends Service {
     }
 
     private void hideProxyNotification() {
-        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(PROXY_NOTIFICATION_ID);
+        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(PROXY_RUNNING_NOTIFICATION_ID);
     }
 
     @Override

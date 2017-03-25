@@ -30,6 +30,7 @@ import rx.subjects.ReplaySubject;
 
 public class StoreApp extends Application {
 
+    public static final int PROXY_RUNNING_NOTIFICATION_ID = 0;
     public static final int UPDATE_PROMPT_NOTIFICATION_ID = 1;
 
 
