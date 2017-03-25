@@ -1,6 +1,8 @@
 package me.tombailey.store;
 
+import android.app.AlarmManager;
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,6 +18,7 @@ import io.realm.RealmConfiguration;
 import me.tombailey.store.http.Cache;
 import me.tombailey.store.http.Proxy;
 import me.tombailey.store.http.Request;
+import me.tombailey.store.service.UpdatePromptReceiver;
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
@@ -27,8 +30,13 @@ import rx.subjects.ReplaySubject;
 
 public class StoreApp extends Application {
 
+    public static final int UPDATE_PROMPT_NOTIFICATION_ID = 1;
+
+
     private static final String LOG_TAG = StoreApp.class.getName();
+
     private static final String NEXT_NOTIFICATION_ID =  "next notification id";
+    private static final String IS_FIRST_RUN =  "isFirstRun";
 
 
     private RealmConfiguration mRealmConfiguration;
@@ -50,6 +58,10 @@ public class StoreApp extends Application {
 
         subscribeForProxyUpdates();
         startProxy();
+
+        if (isFirstRun()) {
+            scheduleWeeklyUpdateReminder();
+        }
     }
 
     private void setupRealm() {
@@ -136,9 +148,11 @@ public class StoreApp extends Application {
     public int getUniqueNotificationId() {
         SharedPreferences sharedPreferences = getSharedPreferences(getPackageName(), MODE_PRIVATE);
 
-        int nextId = sharedPreferences.getInt(NEXT_NOTIFICATION_ID, 1);
+        //skip first 100 ids to allow things like the TOR background service to use reserved
+        //notification ids
+        int nextId = sharedPreferences.getInt(NEXT_NOTIFICATION_ID, 100);
         if (nextId == Integer.MAX_VALUE) {
-            nextId = 0;
+            nextId = 100;
         }
 
         sharedPreferences.edit()
@@ -201,5 +215,24 @@ public class StoreApp extends Application {
         proxyQuery.setComponent(new ComponentName("me.tombailey.store", "me.tombailey.store.service.TorConnectionService"));
         proxyQuery.setAction("status");
         startService(proxyQuery);
+    }
+
+    protected boolean isFirstRun() {
+        SharedPreferences sharedPreferences = getSharedPreferences(getPackageName(), MODE_PRIVATE);
+
+        boolean isFirstRun = sharedPreferences.getBoolean(IS_FIRST_RUN, true);
+        if (isFirstRun) {
+            sharedPreferences.edit().putBoolean(IS_FIRST_RUN, false);
+        }
+
+        return isFirstRun;
+    }
+
+    protected void scheduleWeeklyUpdateReminder() {
+        Intent startUpdatePromptReceiverIntent = new Intent(this, UpdatePromptReceiver.class);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+                AlarmManager.INTERVAL_DAY * 7,
+                PendingIntent.getBroadcast(this, 0, startUpdatePromptReceiverIntent, 0));
     }
 }

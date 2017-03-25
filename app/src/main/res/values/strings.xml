@@ -30,6 +30,9 @@
     <string name="review_service_created_review_notification">Your reviewed was created.</string>
 
 
+    <string name="update_prompt_receiver_update_prompt_notification">Time to check for app updates.</string>
+
+
     <string name="menu_search">Search</string>
 
 
