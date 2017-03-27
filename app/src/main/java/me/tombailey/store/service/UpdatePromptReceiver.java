@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.support.v4.app.NotificationCompat;
 
 import me.tombailey.store.R;
@@ -34,8 +33,8 @@ public class UpdatePromptReceiver extends BroadcastReceiver {
     protected void showUpdatePromptNotification(Context context) {
         Notification updatePromptNotification = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_smartphone_white_24dp)
-                .setContentTitle(Resources.getSystem().getString(R.string.app_name))
-                .setContentText(Resources.getSystem().getString(R.string.update_prompt_receiver_update_prompt_notification))
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentText(context.getString(R.string.update_prompt_receiver_update_prompt_notification))
                 .setAutoCancel(true)
                 .setContentIntent(getUpdatePendingIntent(context))
                 .build();
