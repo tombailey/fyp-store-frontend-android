@@ -40,6 +40,9 @@ public class StoreApp extends Application {
     private static final String IS_FIRST_RUN =  "isFirstRun";
 
 
+    private static StoreApp sInstance;
+
+
     private RealmConfiguration mRealmConfiguration;
 
     private BroadcastReceiver mProxyBroadReceiver;
@@ -51,6 +54,8 @@ public class StoreApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        sInstance = this;
 
         setupRealm();
 
@@ -235,5 +240,10 @@ public class StoreApp extends Application {
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
                 AlarmManager.INTERVAL_DAY * 7,
                 PendingIntent.getBroadcast(this, 0, startUpdatePromptReceiverIntent, 0));
+    }
+
+
+    public static StoreApp getInstance() {
+        return sInstance;
     }
 }
