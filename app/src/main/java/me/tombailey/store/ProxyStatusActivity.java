@@ -3,51 +3,29 @@ package me.tombailey.store;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
 import me.tombailey.store.http.Proxy;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
+import nucleus.factory.RequiresPresenter;
+import nucleus.view.NucleusAppCompatActivity;
 
 /**
  * Created by tomba on 08/02/2017.
  */
 
-public class ProxyStatusActivity extends AppCompatActivity {
-
-    private StoreApp mStoreApp;
+@RequiresPresenter(ProxyStatusPresenter.class)
+public class ProxyStatusActivity extends NucleusAppCompatActivity<ProxyStatusPresenter> {
 
     private View mContent;
     private View mProgress;
     private View mError;
 
-
-    private Subscription mProxySubscription;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_proxy_status);
-
-        init();
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (mProxySubscription != null && !mProxySubscription.isUnsubscribed()) {
-            mProxySubscription.unsubscribe();
-        }
-
-        super.onDestroy();
-    }
-
-    private void init() {
-        mStoreApp = (StoreApp) getApplication();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -74,44 +52,22 @@ public class ProxyStatusActivity extends AppCompatActivity {
         findViewById(R.id.activity_proxy_status_button_stop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mStoreApp.stopProxy();
+                StoreApp.getInstance().stopProxy();
 
                 mProgress.setVisibility(View.VISIBLE);
                 mContent.setVisibility(View.GONE);
             }
         });
 
-
-        displayProxyStatus();
+        init();
     }
 
-    private void displayProxyStatus() {
+    public void init() {
         mProgress.setVisibility(View.VISIBLE);
         mContent.setVisibility(View.GONE);
-
-
-        if (mProxySubscription == null) {
-            mProxySubscription = mStoreApp.subscribeForContinuousProxyUpdates()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Proxy>() {
-                    @Override
-                    public void call(Proxy proxy) {
-                        showStatus(proxy);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        throwable.printStackTrace();
-                        showError();
-                    }
-                });
-        }
-
-        mStoreApp.queryProxyStatus();
     }
 
-    private void showStatus(Proxy proxy) {
+    public void showStatus(Proxy proxy) {
         TextView tvStatus = (TextView) mContent.findViewById(R.id.activity_proxy_status_text_view_status);
         View btnStop = mContent.findViewById(R.id.activity_proxy_status_button_stop);
         if (proxy == null) {
@@ -126,7 +82,7 @@ public class ProxyStatusActivity extends AppCompatActivity {
         mContent.setVisibility(View.VISIBLE);
     }
 
-    private void showError() {
+    public void showError(Throwable throwable) {
         mError.setVisibility(View.VISIBLE);
         mContent.setVisibility(View.GONE);
         mProgress.setVisibility(View.GONE);
@@ -136,7 +92,7 @@ public class ProxyStatusActivity extends AppCompatActivity {
         mError.findViewById(R.id.activity_proxy_status_button_error_retry).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayProxyStatus();
+                getPresenter().start(ProxyStatusPresenter.PROXY_UPDATES);
             }
         });
     }
