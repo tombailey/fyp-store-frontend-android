@@ -18,7 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import me.tombailey.store.fragment.FeaturedAppListFragment;
+import me.tombailey.store.fragment.CategoryAppListFragment;
 import me.tombailey.store.model.Category;
 
 public class MainActivity extends AppCompatActivity {
@@ -104,11 +104,11 @@ public class MainActivity extends AppCompatActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.main_activity_view_pager);
         FragmentStatePagerAdapter fragmentStatePagerAdapter = new FragmentStatePagerAdapter(getSupportFragmentManager()) {
 
-            private Category[] mCategories = new Category[]{
-                Category.COMMUNICATION,
-                Category.ENTERTAINMENT,
-                Category.SHOPPING,
-                Category.UTILITIES
+            private Fragment[] fragments = new Fragment[]{
+                    CategoryAppListFragment.newInstance(Category.COMMUNICATION),
+                    CategoryAppListFragment.newInstance(Category.ENTERTAINMENT),
+                    CategoryAppListFragment.newInstance(Category.SHOPPING),
+                    CategoryAppListFragment.newInstance(Category.UTILITIES)
             };
 
             private String[] mTitles = new String[]{
@@ -120,12 +120,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public Fragment getItem(int position) {
-                return FeaturedAppListFragment.newInstance(mCategories[position]);
+                return fragments[position];
             }
 
             @Override
             public int getCount() {
-                return mCategories.length;
+                return fragments.length;
             }
 
             @Override
