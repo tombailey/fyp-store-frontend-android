@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/search_activity_no_apps"
+                android:text="@string/no_apps"
                 android:textSize="22sp"
                 android:visibility="gone"/>
 

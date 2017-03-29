@@ -73,7 +73,7 @@ public class CategoryAppListFragment extends NucleusSupportFragment<CategoryAppL
 
         TextView tvErrorDescription = (TextView) mErrorView.findViewById(R.id.featured_app_list_fragment_text_view_error_description);
         if (throwable instanceof NoAppsException) {
-            tvErrorDescription.setText(R.string.featured_app_list_fragment_no_apps);
+            tvErrorDescription.setText(R.string.no_apps);
         } else {
             tvErrorDescription.setText(R.string.generic_error);
         }
