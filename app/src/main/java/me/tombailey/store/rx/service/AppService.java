@@ -341,18 +341,18 @@ public class AppService {
     }
 
     /**
-     * Retrieves a List of Apps that should be updated
+     * Retrieves an array of Apps that should be updated
      * @param proxy a Proxy instance with which network connections can be established
      * @param realmConfiguration a RealmConfiguration to create a Realm instance with
      * @param packageManager a PackageManager to verify installed applications with
      * @return an Observable that will emit a List of Apps that need updates or an error
      */
-    public static Observable<List<App>> checkForUpdates(final Proxy proxy,
+    public static Observable<App[]> checkForUpdates(final Proxy proxy,
                                                         final RealmConfiguration realmConfiguration,
                                                         final PackageManager packageManager) {
-        return Observable.create(new Observable.OnSubscribe<List<App>>() {
+        return Observable.create(new Observable.OnSubscribe<App[]>() {
             @Override
-            public void call(Subscriber<? super List<App>> subscriber) {
+            public void call(Subscriber<? super App[]> subscriber) {
                 try {
                     Realm realm = Realm.getInstance(realmConfiguration);
                     List<InstalledApp> installedApps = getInstalledApps(realm, packageManager);
@@ -367,7 +367,7 @@ public class AppService {
 
                     realm.close();
 
-                    subscriber.onNext(appsToUpdate);
+                    subscriber.onNext(appsToUpdate.toArray(new App[appsToUpdate.size()]));
                     subscriber.onCompleted();
                 } catch (Throwable t) {
                     subscriber.onError(t);
