@@ -74,4 +74,14 @@
     <string name="create_review_dialog_creating_review">Creating your review...</string>
 
 
+    <string name="about_activity_store_title">About the sTORe:</string>
+    <string name="about_activity_store_description">The sTORe is an app store where you can download and install applications anonymously. The sTORe also provides installed apps with the connectivity required to increase your privacy online.</string>
+
+    <string name="about_activity_proxy_title">About the proxy:</string>
+    <string name="about_activity_proxy_description">To increase your privacy, the sTORe uses TOR for the network connections it establishes. The TOR proxy runs to provide connectivity for the sTORe and related applications. While it is running a notification is shown so you are always aware.\n\nYou can stop the TOR proxy at anytime but that will prevent connectivity and may cause the sTORe and related apps to no longer work. Most applications should restart the TOR proxy if it is required.</string>
+
+    <string name="about_activity_developer_title">Become a developer:</string>
+    <string name="about_activity_developer_description">Visit http://q6yl3es3js7j3gm3.onion using a web browser with TOR connectivity to register as a developer.</string>
+
+
 </resources>
