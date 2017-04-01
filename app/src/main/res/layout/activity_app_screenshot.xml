@@ -20,7 +20,8 @@
         <ImageView
             android:id="@+id/app_screenshot_activity_image_view_screenshot"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"/>
 
     </LinearLayout>
 
