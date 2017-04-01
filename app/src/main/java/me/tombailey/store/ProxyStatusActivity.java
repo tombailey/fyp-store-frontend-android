@@ -1,8 +1,10 @@
 package me.tombailey.store;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
@@ -52,10 +54,25 @@ public class ProxyStatusActivity extends NucleusAppCompatActivity<ProxyStatusPre
         findViewById(R.id.activity_proxy_status_button_stop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StoreApp.getInstance().stopProxy();
+                new AlertDialog.Builder(ProxyStatusActivity.this)
+                        .setTitle(R.string.proxy_status_activity_dialog_title)
+                        .setMessage(R.string.proxy_status_activity_dialog_description)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                StoreApp.getInstance().stopProxy();
 
-                mProgress.setVisibility(View.VISIBLE);
-                mContent.setVisibility(View.GONE);
+                                mProgress.setVisibility(View.VISIBLE);
+                                mContent.setVisibility(View.GONE);
+                            }
+                        })
+                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
             }
         });
 

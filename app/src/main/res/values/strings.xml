@@ -15,6 +15,8 @@
     <string name="search">Search</string>
     <string name="cancel">Cancel</string>
     <string name="okay">Okay</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <string name="no_apps">No apps found</string>
 
@@ -49,6 +51,9 @@
 
     <string name="proxy_status_activity_proxy_is_running">TOR proxy is running</string>
     <string name="proxy_status_activity_proxy_is_not_running">TOR proxy is not running</string>
+
+    <string name="proxy_status_activity_dialog_title">Stop the proxy?</string>
+    <string name="proxy_status_activity_dialog_description">While most apps should restart the TOR proxy if it is required, stopping the TOR proxy may cause some apps to stop working. Do you still want to stop the proxy?</string>
 
 
     <string name="app_activity_create_review">Create Review</string>
