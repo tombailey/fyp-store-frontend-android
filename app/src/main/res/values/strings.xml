@@ -91,4 +91,7 @@
     <string name="search_activity_loading_apps">Searching for apps...</string>
 
 
+    <string name="category_app_list_fragment_loading_apps">Finding apps...</string>
+
+
 </resources>

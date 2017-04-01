@@ -49,7 +49,7 @@ public class CategoryAppListFragment extends NucleusSupportFragment<CategoryAppL
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View content = inflater.inflate(R.layout.fragment_featured_app_list, container, false);
 
-        mProgressBar = content.findViewById(R.id.featured_app_list_fragment_progress_bar);
+        mProgressBar = content.findViewById(R.id.featured_app_list_fragment_linear_layout_progress);
         mErrorView = content.findViewById(R.id.featured_app_list_fragment_linear_layout_error);
         mRecyclerView = (RecyclerView) content.findViewById(R.id.featured_app_list_fragment_recycler_view);
 
