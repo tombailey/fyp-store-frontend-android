@@ -14,6 +14,7 @@
     <string name="stop">Stop</string>
     <string name="search">Search</string>
     <string name="cancel">Cancel</string>
+    <string name="okay">Okay</string>
 
     <string name="no_apps">No apps found</string>
 
@@ -41,6 +42,9 @@
     <string name="main_activity_category_entertainment">Entertainment</string>
     <string name="main_activity_category_shopping">Shopping</string>
     <string name="main_activity_category_utilities">Utilities</string>
+
+    <string name="main_activity_tor_proxy_dialog_title">Just so you know...</string>
+    <string name="main_activity_tor_proxy_dialog_description">The sTORe uses a TOR proxy to improve your privacy when content is loaded. A notification is displayed while the TOR proxy is running and can be used to stop the TOR proxy at anytime.</string>
 
 
     <string name="proxy_status_activity_proxy_is_running">TOR proxy is running</string>

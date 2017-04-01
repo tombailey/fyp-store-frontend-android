@@ -1,5 +1,6 @@
 package me.tombailey.store;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -59,6 +60,10 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         setupActionBar();
         setupTabLayout();
+
+        if (StoreApp.getInstance().isFirstRun()) {
+            showTorProxyNotificationDialog();
+        }
     }
 
     private void setupActionBar() {
@@ -137,5 +142,18 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.main_activity_tab_layout);
         tabLayout.setupWithViewPager(viewPager);
+    }
+
+    private void showTorProxyNotificationDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.main_activity_tor_proxy_dialog_title)
+                .setMessage(R.string.main_activity_tor_proxy_dialog_description)
+                .setNeutralButton(R.string.okay, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 }
