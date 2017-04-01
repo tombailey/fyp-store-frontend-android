@@ -25,6 +25,7 @@
         <activity android:name=".AboutActivity" />
         <activity android:name=".ProxyStatusActivity" />
         <activity android:name=".AppReviewActivity" />
+        <activity android:name=".AppScreenshotActivity" />
         <activity android:name=".UpdatesActivity" />
 
         <service
