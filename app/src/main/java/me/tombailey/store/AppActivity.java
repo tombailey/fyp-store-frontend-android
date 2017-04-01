@@ -100,8 +100,9 @@ public class AppActivity extends NucleusAppCompatActivity<AppPresenter> {
         srb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                View scrollView = findViewById(R.id.app_activity_scroll_view);
-                scrollView.scrollTo(0, scrollView.getHeight());
+                View rvReviews = findViewById(R.id.app_activity_recycler_view_reviews);
+                findViewById(R.id.app_activity_scroll_view)
+                        .scrollTo(0, (int) rvReviews.getX() + rvReviews.getHeight());
             }
         });
         srb.setRating((float) rating);
