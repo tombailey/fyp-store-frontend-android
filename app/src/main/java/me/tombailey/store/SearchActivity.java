@@ -56,7 +56,7 @@ public class SearchActivity extends NucleusAppCompatActivity<SearchPresenter> {
         });
 
 
-        mProgressView = findViewById(R.id.search_activity_progress_bar);
+        mProgressView = findViewById(R.id.search_activity_linear_layout_progress);
         mAppsView = (RecyclerView) findViewById(R.id.search_activity_recycler_view);
         mNoAppsView = findViewById(R.id.search_activity_text_view_no_apps);
 

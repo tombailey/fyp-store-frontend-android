@@ -88,4 +88,7 @@
     <string name="about_activity_developer_description">Visit http://q6yl3es3js7j3gm3.onion using a web browser with TOR connectivity to register as a developer.</string>
 
 
+    <string name="search_activity_loading_apps">Searching for apps...</string>
+
+
 </resources>
