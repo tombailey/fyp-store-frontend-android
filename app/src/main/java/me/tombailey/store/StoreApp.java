@@ -51,11 +51,14 @@ public class StoreApp extends Application {
     private ReplaySubject<Proxy> mProxyReplaySubject;
     private BehaviorSubject<Proxy> mProxyBehaviorSubject;
 
+    private boolean mIsFirstRun;
+
     @Override
     public void onCreate() {
         super.onCreate();
-
         sInstance = this;
+
+        handleFirstRun();
 
         setupRealm();
 
@@ -64,8 +67,13 @@ public class StoreApp extends Application {
 
         subscribeForProxyUpdates();
         startProxy();
+    }
 
-        if (isFirstRun()) {
+    protected void handleFirstRun() {
+        SharedPreferences sharedPreferences = getSharedPreferences(getPackageName(), MODE_PRIVATE);
+        mIsFirstRun = sharedPreferences.getBoolean(IS_FIRST_RUN, true);
+        if (mIsFirstRun) {
+            sharedPreferences.edit().putBoolean(IS_FIRST_RUN, false).apply();
             scheduleWeeklyUpdateReminder();
         }
     }
@@ -223,15 +231,8 @@ public class StoreApp extends Application {
         startService(proxyQuery);
     }
 
-    protected boolean isFirstRun() {
-        SharedPreferences sharedPreferences = getSharedPreferences(getPackageName(), MODE_PRIVATE);
-
-        boolean isFirstRun = sharedPreferences.getBoolean(IS_FIRST_RUN, true);
-        if (isFirstRun) {
-            sharedPreferences.edit().putBoolean(IS_FIRST_RUN, false);
-        }
-
-        return isFirstRun;
+    public boolean isFirstRun() {
+        return mIsFirstRun;
     }
 
     protected void scheduleWeeklyUpdateReminder() {
