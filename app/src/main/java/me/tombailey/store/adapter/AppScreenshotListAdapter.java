@@ -76,7 +76,7 @@ public class AppScreenshotListAdapter extends RecyclerView.Adapter<AppScreenshot
                 @Override
                 public void onClick(View view) {
                     mScreenshotSelectedListener.onSelected(new File(mTempCacheDir,
-                            mApp.getId() + "-screenshot-" + mScreenshotNumber + "-.png"));
+                            mApp.getId() + "-screenshot-" + mScreenshotNumber + ".png"));
                 }
             });
             ivScreenshot = (ImageView) itemView.findViewById(R.id.list_screenshot_view_image_view_screenshot);
