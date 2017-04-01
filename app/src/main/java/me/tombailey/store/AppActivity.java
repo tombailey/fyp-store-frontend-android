@@ -209,7 +209,10 @@ public class AppActivity extends NucleusAppCompatActivity<AppPresenter> {
                 new AdapterItemSelectedListener<File>() {
                     @Override
                     public void onSelected(File screenshotFile) {
-                        //TODO: allow fullscreen screenshots
+                        Intent appScreenshotIntent = new Intent(AppActivity.this, AppScreenshotActivity.class);
+                        appScreenshotIntent.putExtra(AppScreenshotActivity.SCREENSHOT_PATH,
+                                screenshotFile.getAbsolutePath());
+                        startActivity(appScreenshotIntent);
                     }
                 });
         rvScreenshots.setAdapter(appScreenshotListAdapter);
