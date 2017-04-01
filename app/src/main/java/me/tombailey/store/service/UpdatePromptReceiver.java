@@ -20,9 +20,14 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class UpdatePromptReceiver extends BroadcastReceiver {
 
+    public static final String SHOW_NOTIFICATION = "show notification";
+
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        showUpdatePromptNotification(context);
+        if (intent != null && SHOW_NOTIFICATION.equalsIgnoreCase(intent.getAction())) {
+            showUpdatePromptNotification(context);
+        }
     }
 
     protected PendingIntent getUpdatePendingIntent(Context context) {

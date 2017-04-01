@@ -24,6 +24,8 @@ import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 import rx.subjects.ReplaySubject;
 
+import static me.tombailey.store.service.UpdatePromptReceiver.SHOW_NOTIFICATION;
+
 /**
  * Created by tomba on 04/02/2017.
  */
@@ -237,8 +239,10 @@ public class StoreApp extends Application {
 
     protected void scheduleWeeklyUpdateReminder() {
         Intent startUpdatePromptReceiverIntent = new Intent(this, UpdatePromptReceiver.class);
+        startUpdatePromptReceiverIntent.setAction(SHOW_NOTIFICATION);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + AlarmManager.INTERVAL_DAY * 7,
                 AlarmManager.INTERVAL_DAY * 7,
                 PendingIntent.getBroadcast(this, 0, startUpdatePromptReceiverIntent, 0));
     }
