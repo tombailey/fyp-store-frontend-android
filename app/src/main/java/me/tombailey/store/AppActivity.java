@@ -1,13 +1,11 @@
 package me.tombailey.store;
 
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -23,35 +21,24 @@ import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 
 import java.io.File;
 
-import io.realm.Realm;
 import me.tombailey.store.adapter.AdapterItemSelectedListener;
 import me.tombailey.store.adapter.AppReviewListAdapter;
 import me.tombailey.store.adapter.AppScreenshotListAdapter;
-import me.tombailey.store.exception.ProxyNotRunningException;
-import me.tombailey.store.http.Proxy;
 import me.tombailey.store.model.App;
-import me.tombailey.store.model.InstalledApp;
 import me.tombailey.store.model.Review;
-import me.tombailey.store.rx.service.AppService;
-import me.tombailey.store.rx.service.HttpService;
-import me.tombailey.store.service.AppDownloadService;
-import me.tombailey.store.service.AppReviewService;
 import me.tombailey.store.util.NavigationUtil;
-import rx.Observable;
-import rx.Subscription;
-import rx.functions.Action1;
-import rx.functions.Func1;
+import nucleus.factory.RequiresPresenter;
+import nucleus.view.NucleusAppCompatActivity;
 
 /**
  * Created by tomba on 30/11/2016.
  */
 
-public class AppActivity extends AppCompatActivity {
+@RequiresPresenter(AppPresenter.class)
+public class AppActivity extends NucleusAppCompatActivity<AppPresenter> {
 
     public static final String APP = "app";
 
-
-    private StoreApp mStoreApp;
 
     private App mApp;
 
@@ -62,43 +49,15 @@ public class AppActivity extends AppCompatActivity {
 
     private Button mInstallOrUpdate;
 
-    private Subscription mDownloadAppSubscription;
-    private Subscription mDownloadIconSubscription;
-    private Subscription mGetReviewsSubscription;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app);
 
-        mStoreApp = (StoreApp) getApplication();
-
         Intent intent = getIntent();
         mApp = intent.getParcelableExtra(APP);
 
-        mReviewsRecyclerView = findViewById(R.id.app_activity_recycler_view_reviews);
-        mReviewsShowAllView = findViewById(R.id.app_activity_text_view_show_all);
-        mReviewsProgressView = findViewById(R.id.app_activity_progress_bar_reviews);
-        mReviewsErrorView = findViewById(R.id.app_activity_linear_layout_reviews_error);
 
-        init();
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (mDownloadAppSubscription != null && !mDownloadAppSubscription.isUnsubscribed()) {
-            mDownloadAppSubscription.unsubscribe();
-        }
-        if (mDownloadIconSubscription != null && !mDownloadIconSubscription.isUnsubscribed()) {
-            mDownloadIconSubscription.unsubscribe();
-        }
-        if (mGetReviewsSubscription != null && !mGetReviewsSubscription.isUnsubscribed()) {
-            mGetReviewsSubscription.unsubscribe();
-        }
-        super.onDestroy();
-    }
-
-    private void init() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setTitle(getTitle());
@@ -117,11 +76,25 @@ public class AppActivity extends AppCompatActivity {
         });
 
 
+        mReviewsRecyclerView = findViewById(R.id.app_activity_recycler_view_reviews);
+        mReviewsShowAllView = findViewById(R.id.app_activity_text_view_show_all);
+        mReviewsProgressView = findViewById(R.id.app_activity_progress_bar_reviews);
+        mReviewsErrorView = findViewById(R.id.app_activity_linear_layout_reviews_error);
+
+
+        getPresenter().showApp(mApp);
+        getPresenter().loadIcon(mApp);
+        getPresenter().loadReviews(mApp);
+        showScreenshots();
+    }
+
+    public void showApp(String name, String description, double rating, final boolean isInstalled,
+                        final boolean needsUpdate) {
         TextView tvName = (TextView) findViewById(R.id.app_activity_text_view_name);
-        tvName.setText(mApp.getName());
+        tvName.setText(name);
 
         TextView tvDescription = (TextView) findViewById(R.id.app_activity_text_view_description);
-        tvDescription.setText(mApp.getDescription());
+        tvDescription.setText(description);
 
         SimpleRatingBar srb = (SimpleRatingBar) findViewById(R.id.app_activity_simple_rating_bar);
         srb.setOnClickListener(new View.OnClickListener() {
@@ -131,37 +104,21 @@ public class AppActivity extends AppCompatActivity {
                 scrollView.scrollTo(0, scrollView.getHeight());
             }
         });
-        srb.setRating((float) mApp.getRating());
+        srb.setRating((float) rating);
 
 
         mInstallOrUpdate = (Button) findViewById(R.id.app_activity_button_install);
-        if (isAlreadyInstalled() && !isUpdateNeeded()) {
+        if (isInstalled && !needsUpdate) {
             mInstallOrUpdate.setText(R.string.app_activity_open);
             mInstallOrUpdate.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent launchIntent = getLaunchIntent();
-                    if (launchIntent == null) {
-                        Toast.makeText(AppActivity.this,
-                                getString(R.string.app_activity_app_no_longer_installed),
-                                Toast.LENGTH_SHORT).show();
-
-                        mInstallOrUpdate.setText(isUpdateNeeded() ?
-                                R.string.app_activity_update : R.string.app_activity_install);
-                        mInstallOrUpdate.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                downloadApp();
-                            }
-                        });
-                    } else {
-                        startActivity(launchIntent);
-                    }
+                    getPresenter().openApp(mApp);
                 }
             });
         } else {
-            mInstallOrUpdate.setText(isUpdateNeeded() ?
-                    R.string.app_activity_update : R.string.app_activity_install);
+            mInstallOrUpdate.setText(needsUpdate ? R.string.app_activity_update :
+                    R.string.app_activity_install);
             mInstallOrUpdate.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -185,63 +142,24 @@ public class AppActivity extends AppCompatActivity {
                 startActivity(reviewActivityIntent);
             }
         });
-
-        showIcon();
-        showScreenshots();
-        getReviews();
-    }
-
-    private boolean isAlreadyInstalled() {
-        //TODO: move realm off UI thread
-        Realm realm = mStoreApp.getRealm();
-
-        InstalledApp installedApp = realm.where(InstalledApp.class)
-                .equalTo("mAppId", mApp.getId())
-                .findFirst();
-
-        boolean isInstalled = installedApp != null;
-        realm.close();
-        return isInstalled;
-    }
-
-    private Intent getLaunchIntent() {
-        //TODO: move realm off UI thread
-        Realm realm = mStoreApp.getRealm();
-
-        InstalledApp installedApp = realm.where(InstalledApp.class)
-                .equalTo("mAppId", mApp.getId())
-                .findFirst();
-
-        Intent launchIntent = null;
-        if (installedApp != null) {
-            launchIntent = getPackageManager().getLaunchIntentForPackage(installedApp.getAppId());
-        }
-        realm.close();
-        return launchIntent;
-    }
-
-    private boolean isUpdateNeeded() {
-        //TODO: move realm off UI thread
-        Realm realm = mStoreApp.getRealm();
-
-        InstalledApp installedApp = realm.where(InstalledApp.class)
-                .equalTo("mAppId", mApp.getId())
-                .findFirst();
-
-        boolean updateNeeded = installedApp != null && installedApp.getVersionNumber() < mApp.getCurrentVersionNumber();
-        realm.close();
-        return updateNeeded;
     }
 
     private void downloadApp() {
         Toast.makeText(AppActivity.this, R.string.app_activity_app_downloading, Toast.LENGTH_LONG).show();
+        getPresenter().downloadApp(mApp);
+    }
 
-        Intent downloadAppInBackgroundIntent = new Intent();
-        downloadAppInBackgroundIntent.setComponent(
-                new ComponentName("me.tombailey.store", "me.tombailey.store.service.AppDownloadService"));
-        downloadAppInBackgroundIntent.setAction(AppDownloadService.DOWNLOAD_APP);
-        downloadAppInBackgroundIntent.putExtra(AppDownloadService.APP, mApp);
-        startService(downloadAppInBackgroundIntent);
+    public void showAppNotInstalled() {
+        Toast.makeText(AppActivity.this, getString(R.string.app_activity_app_no_longer_installed),
+                Toast.LENGTH_SHORT).show();
+
+        mInstallOrUpdate.setText(R.string.app_activity_install);
+        mInstallOrUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                downloadApp();
+            }
+        });
     }
 
     private void showCreateReviewDialog() {
@@ -264,125 +182,67 @@ public class AppActivity extends AppCompatActivity {
                                 .getText().toString();
                         int reviewStars = (int) ((SimpleRatingBar) createReviewView.findViewById(R.id.create_review_dialog_rating_bar_stars))
                                 .getRating();
-                        createReview(reviewDescription, reviewStars);
+                        getPresenter().createReview(mApp, reviewDescription, reviewStars);
                     }
                 })
                 .setCancelable(false)
                 .show();
     }
 
-    private void createReview(final String description, final int stars) {
-        Toast.makeText(AppActivity.this, R.string.create_review_dialog_creating_review, Toast.LENGTH_LONG).show();
-
-        Intent createReviewInBackgroundIntent = new Intent();
-        createReviewInBackgroundIntent.setComponent(
-                new ComponentName("me.tombailey.store", "me.tombailey.store.service.AppReviewService"));
-        createReviewInBackgroundIntent.putExtra(AppReviewService.APP, mApp);
-        createReviewInBackgroundIntent.putExtra(AppReviewService.DESCRIPTION, description);
-        createReviewInBackgroundIntent.putExtra(AppReviewService.STARS, stars);
-        startService(createReviewInBackgroundIntent);
+    public void showIcon(File iconFile) {
+        ImageView ivIcon = (ImageView) findViewById(R.id.app_activity_image_view_icon);
+        Glide.with(AppActivity.this).load(iconFile).into(ivIcon);
     }
 
-    private void showIcon() {
-        if (mDownloadIconSubscription != null && !mDownloadIconSubscription.isUnsubscribed()) {
-            mDownloadIconSubscription.unsubscribe();
-        }
-
-        final File iconFile = new File(getCacheDir(), "app" + File.separator + mApp.getId() +
-                File.separator + "icon.png");
-        iconFile.getParentFile().mkdirs();
-
-        mDownloadIconSubscription = mStoreApp.subscribeForProxy().flatMap(new Func1<Proxy, Observable<File>>() {
-            @Override
-            public Observable<File> call(Proxy proxy) {
-                if (proxy == null) {
-                    throw new ProxyNotRunningException();
-                } else {
-                    return HttpService.download(proxy, mApp.getIconLink(), iconFile);
-                }
-            }
-        }).subscribe(new Action1<File>() {
-            @Override
-            public void call(File file) {
-                ImageView ivIcon = (ImageView) findViewById(R.id.app_activity_image_view_icon);
-                Glide.with(AppActivity.this).load(file).into(ivIcon);
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                throwable.printStackTrace();
-
-                //TODO: handle icon not loading
-            }
-        });
+    public void showIconError() {
+        ImageView ivIcon = (ImageView) findViewById(R.id.app_activity_image_view_icon);
+        //TODO: handle
     }
 
     private void showScreenshots() {
         RecyclerView rvScreenshots = (RecyclerView) findViewById(R.id.app_activity_recycler_view_screenshots);
         rvScreenshots.setHasFixedSize(true);
         rvScreenshots.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        StoreApp storeApp = StoreApp.getInstance();
         AppScreenshotListAdapter appScreenshotListAdapter = new AppScreenshotListAdapter(mApp,
-            Glide.with(this), mStoreApp.getProxy(), mStoreApp.getTempCacheDirectory(),
-            new AdapterItemSelectedListener<File>() {
-                @Override
-                public void onSelected(File screenshotFile) {
-                    //TODO: allow fullscreen screenshots
-                }
-            });
+                Glide.with(this), storeApp.getProxy(), storeApp.getTempCacheDirectory(),
+                new AdapterItemSelectedListener<File>() {
+                    @Override
+                    public void onSelected(File screenshotFile) {
+                        //TODO: allow fullscreen screenshots
+                    }
+                });
         rvScreenshots.setAdapter(appScreenshotListAdapter);
     }
 
-    private void getReviews() {
-        if (mApp.getReviews().length == 0) {
-            mReviewsRecyclerView.setVisibility(View.GONE);
-            mReviewsShowAllView.setVisibility(View.GONE);
-            mReviewsErrorView.setVisibility(View.GONE);
-            mReviewsProgressView.setVisibility(View.VISIBLE);
+    public void showReviewsError() {
+        TextView tvErrorDescription =
+                (TextView) mReviewsErrorView.findViewById(R.id.app_activity_text_view_reviews_error_description);
+        tvErrorDescription.setText(R.string.generic_error);
 
-            mGetReviewsSubscription = mStoreApp.subscribeForProxy()
-                .flatMap(new Func1<Proxy, Observable<Review[]>>() {
-                    @Override
-                    public Observable<Review[]> call(Proxy proxy) {
-                        return AppService.getReviewsForApp(proxy, mApp);
-                    }
-                }).subscribe(new Action1<Review[]>() {
-                    @Override
-                    public void call(Review[] reviews) {
-                        mApp.setReviews(reviews);
-                        showReviews();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        throwable.printStackTrace();
-
-                        TextView tvErrorDescription =
-                                (TextView) mReviewsErrorView.findViewById(R.id.app_activity_text_view_reviews_error_description);
-                        tvErrorDescription.setText(R.string.generic_error);
-
-                        mReviewsRecyclerView.setVisibility(View.GONE);
-                        mReviewsShowAllView.setVisibility(View.GONE);
-                        mReviewsProgressView.setVisibility(View.GONE);
-                        mReviewsErrorView.setVisibility(View.VISIBLE);
-                    }
-                });
-        }
+        mReviewsRecyclerView.setVisibility(View.GONE);
+        mReviewsShowAllView.setVisibility(View.GONE);
+        mReviewsProgressView.setVisibility(View.GONE);
+        mReviewsErrorView.setVisibility(View.VISIBLE);
     }
 
-    private void showReviews() {
-        if (mApp.getReviews().length == 0) {
-            TextView tvErrorDescription =
-                    (TextView) mReviewsErrorView.findViewById(R.id.app_activity_text_view_reviews_error_description);
-            tvErrorDescription.setText(R.string.app_activity_reviews_no_reviews);
+    public void showNoReviews() {
+        TextView tvErrorDescription =
+                (TextView) mReviewsErrorView.findViewById(R.id.app_activity_text_view_reviews_error_description);
+        tvErrorDescription.setText(R.string.app_activity_reviews_no_reviews);
 
-            mReviewsRecyclerView.setVisibility(View.GONE);
-            mReviewsShowAllView.setVisibility(View.GONE);
-            mReviewsProgressView.setVisibility(View.GONE);
-            mReviewsErrorView.setVisibility(View.VISIBLE);
-        } else {
-            RecyclerView rvReviews = (RecyclerView) findViewById(R.id.app_activity_recycler_view_reviews);
-            rvReviews.setLayoutManager(new LinearLayoutManager(this));
-            AppReviewListAdapter appReviewListAdapter = new AppReviewListAdapter(getReviewsPreview(),
+        mReviewsRecyclerView.setVisibility(View.GONE);
+        mReviewsShowAllView.setVisibility(View.GONE);
+        mReviewsProgressView.setVisibility(View.GONE);
+        mReviewsErrorView.setVisibility(View.VISIBLE);
+    }
+
+    public void showReviews(Review[] reviews) {
+        mApp.setReviews(reviews);
+
+        RecyclerView rvReviews = (RecyclerView) findViewById(R.id.app_activity_recycler_view_reviews);
+        rvReviews.setLayoutManager(new LinearLayoutManager(this));
+        AppReviewListAdapter appReviewListAdapter = new AppReviewListAdapter(reviews,
                 new AdapterItemSelectedListener<Review>() {
                     @Override
                     public void onSelected(Review review) {
@@ -391,20 +251,15 @@ public class AppActivity extends AppCompatActivity {
                         startActivity(reviewActivityIntent);
                     }
                 });
-            rvReviews.setAdapter(appReviewListAdapter);
+        rvReviews.setAdapter(appReviewListAdapter);
 
-            mReviewsProgressView.setVisibility(View.GONE);
-            mReviewsErrorView.setVisibility(View.GONE);
-            mReviewsRecyclerView.setVisibility(View.VISIBLE);
-            mReviewsShowAllView.setVisibility(View.VISIBLE);
-        }
+        mReviewsProgressView.setVisibility(View.GONE);
+        mReviewsErrorView.setVisibility(View.GONE);
+        mReviewsRecyclerView.setVisibility(View.VISIBLE);
+        mReviewsShowAllView.setVisibility(View.VISIBLE);
     }
 
-    private Review[] getReviewsPreview() {
-        Review[] reviewsPreview = new Review[mApp.getReviews().length >= 2 ? 2 : mApp.getReviews().length];
-        for (int index = 0; index < reviewsPreview.length; index++) {
-            reviewsPreview[index] = mApp.getReviews()[index];
-        }
-        return reviewsPreview;
+    public void showReviewBeingCreated() {
+        Toast.makeText(AppActivity.this, R.string.create_review_dialog_creating_review, Toast.LENGTH_LONG).show();
     }
 }
