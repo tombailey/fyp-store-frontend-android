@@ -236,6 +236,9 @@ public class AppPresenter extends RxPresenter<AppActivity> {
     protected void onSave(Bundle state) {
         super.onSave(state);
         state.putParcelable(APP, mApp);
+
+        stop(OPEN_APP);
+        stop(DOWNLOAD_APP);
     }
 
     public void showApp(App app) {
