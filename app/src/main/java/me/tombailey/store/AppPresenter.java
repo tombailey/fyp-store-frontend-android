@@ -152,7 +152,6 @@ public class AppPresenter extends RxPresenter<AppActivity> {
             }
         });
 
-        //TODO: re-launching on return to app
         restartableLatestCache(OPEN_APP, new Func0<Observable<Intent>>() {
             @Override
             public Observable<Intent> call() {
@@ -170,7 +169,7 @@ public class AppPresenter extends RxPresenter<AppActivity> {
                 realm.close();
 
                 if (launchIntent == null) {
-                    throw new AppNotInstalledException();
+                    return Observable.just(null);
                 } else {
                     return Observable.just(launchIntent);
                 }
@@ -178,13 +177,11 @@ public class AppPresenter extends RxPresenter<AppActivity> {
         }, new Action2<AppActivity, Intent>() {
             @Override
             public void call(AppActivity appActivity, Intent launchIntent) {
-                StoreApp.getInstance().startActivity(launchIntent);
-            }
-        }, new Action2<AppActivity, Throwable>() {
-            @Override
-            public void call(AppActivity appActivity, Throwable throwable) {
-                throwable.printStackTrace();
-                appActivity.showAppNotInstalled();
+                if (launchIntent == null) {
+                    appActivity.showAppNotInstalled();
+                } else {
+                    StoreApp.getInstance().startActivity(launchIntent);
+                }
             }
         });
 
