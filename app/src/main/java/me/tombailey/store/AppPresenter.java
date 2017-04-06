@@ -16,6 +16,7 @@ import me.tombailey.store.model.InstalledApp;
 import me.tombailey.store.model.Review;
 import me.tombailey.store.rx.service.AppService;
 import me.tombailey.store.rx.service.HttpService;
+import me.tombailey.store.service.AppDownloadService;
 import me.tombailey.store.service.AppReviewService;
 import nucleus.presenter.RxPresenter;
 import rx.Observable;
@@ -187,28 +188,21 @@ public class AppPresenter extends RxPresenter<AppActivity> {
             }
         });
 
-        restartableLatestCache(DOWNLOAD_APP, new Func0<Observable<Review[]>>() {
+        restartableLatestCache(DOWNLOAD_APP, new Func0<Observable<Boolean>>() {
             @Override
-            public Observable<Review[]> call() {
-                final StoreApp storeApp = StoreApp.getInstance();
-                return storeApp.subscribeForProxy().flatMap(new Func1<Proxy, Observable<Review[]>>() {
-                    @Override
-                    public Observable<Review[]> call(Proxy proxy) {
-                        //TODO:
-                        return null;
-                    }
-                });
+            public Observable<Boolean> call() {
+                Intent downloadAppInBackgroundIntent = new Intent();
+                downloadAppInBackgroundIntent.setComponent(
+                        new ComponentName("me.tombailey.store", "me.tombailey.store.service.AppDownloadService"));
+                downloadAppInBackgroundIntent.putExtra(AppReviewService.APP, mApp);
+                downloadAppInBackgroundIntent.setAction(AppDownloadService.DOWNLOAD_APP);
+                StoreApp.getInstance().startService(downloadAppInBackgroundIntent);
+                return Observable.just(true);
             }
-        }, new Action2<AppActivity, Review[]>() {
+        }, new Action2<AppActivity, Boolean>() {
             @Override
-            public void call(AppActivity appActivity, Review[] reviews) {
-                //TODO:
-            }
-        }, new Action2<AppActivity, Throwable>() {
-            @Override
-            public void call(AppActivity appActivity, Throwable throwable) {
-                throwable.printStackTrace();
-                //TODO:
+            public void call(AppActivity appActivity, Boolean downloading) {
+                //ignored
             }
         });
 
