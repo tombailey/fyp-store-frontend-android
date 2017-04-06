@@ -8,7 +8,6 @@ import android.support.v4.util.Pair;
 import java.io.File;
 
 import io.realm.Realm;
-import me.tombailey.store.exception.AppNotInstalledException;
 import me.tombailey.store.exception.ProxyNotRunningException;
 import me.tombailey.store.http.Proxy;
 import me.tombailey.store.model.App;
@@ -143,12 +142,6 @@ public class AppPresenter extends RxPresenter<AppActivity> {
             public void call(AppActivity appActivity, Pair<Boolean, Boolean> isInstalledAndNeedsUpdate) {
                appActivity.showApp(mApp.getName(), mApp.getDescription(), mApp.getRating(),
                        isInstalledAndNeedsUpdate.first, isInstalledAndNeedsUpdate.second);
-            }
-        }, new Action2<AppActivity, Throwable>() {
-            @Override
-            public void call(AppActivity appActivity, Throwable throwable) {
-                throwable.printStackTrace();
-                //TODO: handle
             }
         });
 
