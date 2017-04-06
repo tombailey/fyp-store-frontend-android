@@ -31,11 +31,13 @@ import rx.functions.Func1;
 public class AppDownloadService extends Service {
 
     public static final String DOWNLOAD_APP = "download app";
-    public static final String APP_INSTALL = "app install";
-    public static final String CANCEL_APP_INSTALL = "cancel app install";
 
     public static final String APP = "app";
     public static final String APK_SAVE_FILE = "apk save file";
+
+
+    private static final String APP_INSTALL = "app install";
+    private static final String CANCEL_APP_INSTALL = "cancel app install";
 
 
     private static final String LOG_TAG = AppDownloadService.class.getName();
