@@ -38,9 +38,6 @@ public class AboutActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
-
-
-        //TODO: show help and about information
     }
 
 }
