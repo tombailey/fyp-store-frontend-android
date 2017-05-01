@@ -31,10 +31,4 @@ public class MainActivityTest {
                 .check(matches(isDisplayed()));
     }
 
-    @Test
-    public void whenLoaded_shouldShowRecyclerView() {
-        onView(allOf(withId(R.id.featured_app_list_fragment_recycler_view), isDisplayed()))
-                .check(matches(isDisplayed()));
-    }
-
 }
