@@ -80,7 +80,6 @@ public class AppPresenter extends RxPresenter<AppActivity> {
             @Override
             public void call(AppActivity appActivity, Throwable throwable) {
                 throwable.printStackTrace();
-                appActivity.showIconError();
             }
         });
 

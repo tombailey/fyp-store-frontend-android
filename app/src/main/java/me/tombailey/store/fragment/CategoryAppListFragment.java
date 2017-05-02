@@ -109,8 +109,6 @@ public class CategoryAppListFragment extends NucleusSupportFragment<CategoryAppL
                 });
         mRecyclerView.setAdapter(featuredAppListAdapter);
 
-        //TODO: load more when bottom reached
-
         mProgressBar.setVisibility(View.GONE);
         mErrorView.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);

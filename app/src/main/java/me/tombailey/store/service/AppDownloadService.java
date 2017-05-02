@@ -118,7 +118,6 @@ public class AppDownloadService extends Service {
         }, new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
-                //TODO: handle
                 throwable.printStackTrace();
             }
         });
@@ -134,8 +133,6 @@ public class AppDownloadService extends Service {
         appInstallIntent.putExtra(APK_SAVE_FILE, apkSaveFile.getAbsolutePath());
         appInstallIntent.putExtra(APP, app);
         appInstallIntent.setAction(APP_INSTALL);
-        //TODO: make pending intent unique to avoid update scenario
-
         return PendingIntent.getService(this, 0, appInstallIntent, 0);
     }
 
@@ -144,8 +141,6 @@ public class AppDownloadService extends Service {
         cancelAppInstall.setComponent(new ComponentName("me.tombailey.store", "me.tombailey.store.service.AppDownloadService"));
         cancelAppInstall.putExtra(APK_SAVE_FILE, apkSaveFile.getAbsolutePath());
         cancelAppInstall.setAction(CANCEL_APP_INSTALL);
-        //TODO: make pending intent unique to avoid update scenario
-
         return PendingIntent.getService(this, 0, cancelAppInstall, 0);
     }
 

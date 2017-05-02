@@ -195,11 +195,6 @@ public class AppActivity extends NucleusAppCompatActivity<AppPresenter> {
         Glide.with(AppActivity.this).load(iconFile).into(ivIcon);
     }
 
-    public void showIconError() {
-        ImageView ivIcon = (ImageView) findViewById(R.id.app_activity_image_view_icon);
-        //TODO: handle
-    }
-
     private void showScreenshots() {
         RecyclerView rvScreenshots = (RecyclerView) findViewById(R.id.app_activity_recycler_view_screenshots);
         rvScreenshots.setHasFixedSize(true);
