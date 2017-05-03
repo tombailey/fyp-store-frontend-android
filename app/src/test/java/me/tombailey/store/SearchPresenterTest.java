@@ -22,7 +22,7 @@ import static org.mockito.Mockito.times;
 public class SearchPresenterTest {
 
     @Test
-    public void whenCreateReview_shouldStartCreateReview() {
+    public void whenSearch_shouldStartSearch() {
         //arrange
         SearchPresenter searchPresenter = Mockito.spy(new SearchPresenter());
         Mockito.doNothing().when(searchPresenter).start(SEARCH);

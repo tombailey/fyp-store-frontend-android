@@ -22,7 +22,7 @@ import static org.mockito.Mockito.times;
 public class UpdatesPresenterTest {
 
     @Test
-    public void whenCreateReview_shouldStartCreateReview() {
+    public void whenCheckForUpdate_shouldStartCheckForUpdate() {
         //arrange
         UpdatesPresenter updatesPresenter = Mockito.spy(new UpdatesPresenter());
         Mockito.doNothing().when(updatesPresenter).start(CHECK_FOR_UPDATE);
