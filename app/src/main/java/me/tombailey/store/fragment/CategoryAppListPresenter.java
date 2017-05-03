@@ -2,18 +2,22 @@ package me.tombailey.store.fragment;
 
 import android.os.Bundle;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import me.tombailey.store.StoreApp;
 import me.tombailey.store.exception.NoAppsException;
 import me.tombailey.store.exception.ProxyNotRunningException;
 import me.tombailey.store.http.Proxy;
+import me.tombailey.store.http.Request;
+import me.tombailey.store.http.Response;
 import me.tombailey.store.model.App;
 import me.tombailey.store.model.Category;
 import me.tombailey.store.rx.service.AppService;
 import nucleus.presenter.RxPresenter;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Action2;
 import rx.functions.Func0;
 import rx.functions.Func1;
@@ -41,6 +45,47 @@ public class CategoryAppListPresenter extends RxPresenter<CategoryAppListFragmen
         }
 
         final StoreApp storeApp = StoreApp.getInstance();
+
+
+
+
+        storeApp.subscribeForProxy()
+                .timeout(2, TimeUnit.MINUTES)
+                .flatMap(new Func1<Proxy, Observable<App[]>>() {
+                    @Override
+                    public Observable<App[]> call(final Proxy proxy) {
+                        if (proxy == null) {
+                            storeApp.startProxy();
+                            throw new ProxyNotRunningException();
+                        } else {
+                            try {
+                                Request request = new Request.Builder()
+                                        .proxy(proxy)
+                                        .get()
+                                        .url("http://www.google.co.uk/")
+                                        .build();
+
+                                Response response = request.execute();
+                            } catch (IOException ioe) {
+                                ioe.printStackTrace();
+                            }
+                            return null;
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Action1<App[]>() {
+            @Override
+            public void call(App[] apps) {
+
+            }
+        });
+
+
+
+
+
         restartableLatestCache(LOAD_APPS, new Func0<Observable<App[]>>() {
             @Override
             public Observable<App[]> call() {
